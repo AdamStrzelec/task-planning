@@ -18,7 +18,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "jsxImportSource": "@welldone-software/why-did-you-render",
   },
   "include": [
     "src"
