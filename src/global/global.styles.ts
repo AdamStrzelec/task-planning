@@ -10,4 +10,4 @@ export const GlobalStyle = createGlobalStyle`
     ::-webkit-scrollbar-thumb {
         /* width: 0; */
     }
-`
+`;
