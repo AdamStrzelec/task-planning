@@ -7,13 +7,32 @@ import {
 	decrement,
 	incrementByAmount,
 } from './store/DragAndDropStore/DragAndDropStore';
-import { DragContainer } from './components/DragContainer/DragContainer';
+import { DragAndDropContainer } from './components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
+// import { DragContainer } from './components/DragContainer/DragContainer';
 
 function App() {
 	return (
 		<div>
 			<GlobalStyle />
-			<DragContainer />
+			<div
+				style={{
+					position: 'relative',
+					width: '100vw',
+					height: 200,
+					backgroundColor: 'pink',
+					// zIndex: 1002,
+				}}
+			/>
+			<div
+				style={{
+					paddingLeft: 250,
+					// transform: 'translateY(-100px)',
+					position: 'relative',
+					// zIndex: 1001,
+				}}
+			>
+				<DragAndDropContainer />
+			</div>
 		</div>
 	);
 }
