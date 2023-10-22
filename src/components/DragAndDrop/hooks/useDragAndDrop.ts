@@ -1,4 +1,11 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react';
+import { useEffect, useCallback, useState, useMemo } from 'react';
+import { useContextSelector } from 'use-context-selector';
+import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
+import {
+	onDragItemProps,
+	onDropItemProps,
+} from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
+import { DragAndDropHelpers } from 'src/components/DragAndDrop/helpers/DragAndDrop.helpers';
 
 export interface DraggedItemMetadataProps {
 	itemId: string;
@@ -7,138 +14,144 @@ export interface DraggedItemMetadataProps {
 }
 
 export const useDragAndDrop = () => {
+	const { changeItemsPositionInfoAfterDropItem, getColumnsOfItems } =
+		DragAndDropHelpers;
+
 	const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
 	const [draggedItemPositionDifference, setDraggedItemPositionDifference] =
 		useState({ x: 0, y: 0 });
-	const [draggedItemMetadata, setDraggedItemMetadata] =
-		useState<DraggedItemMetadataProps | null>(null);
 
-	const items = useRef({
-		'1': {
-			id: '1',
-			columnId: '1',
-			order: 1,
-			isDragged: false,
-			posX: 0,
-			posY: 0,
-			color: 'orange',
-		},
-		'2': {
-			id: '2',
-			columnId: '1',
-			order: 2,
-			isDragged: false,
-			posX: 0,
-			posY: 0,
-			color: 'green',
-		},
-		'3': {
-			id: '3',
-			columnId: '1',
-			order: 3,
-			isDragged: false,
-			posX: 0,
-			posY: 0,
-			color: 'blue',
-		},
-		'4': {
-			id: '4',
-			columnId: '1',
-			order: 4,
-			isDragged: false,
-			posX: 0,
-			posY: 0,
-			color: 'yellow',
-		},
-		'5': {
-			id: '5',
-			columnId: '1',
-			order: 5,
-			isDragged: false,
-			posX: 0,
-			posY: 0,
-			color: 'red',
-		},
-	});
+	const {
+		items,
+		setItems,
+		setDraggedItemMetadata,
+		draggedItemMetadata,
+		setDroppedItemMetadata,
+	} = useContextSelector(DragAndDropContext, (state) => state);
 
-	const handleBoxPosition = (event: MouseEvent) => {
+	const columnsOfItems = useMemo(() => getColumnsOfItems(items), [items]);
+
+	const handleCursorPosition = (event: MouseEvent) => {
 		setCursorPosition({ x: event.pageX, y: event.pageY });
 	};
 
 	useEffect(() => {
 		window.addEventListener('mousemove', (event) =>
-			handleBoxPosition(event),
+			handleCursorPosition(event),
 		);
 
 		return () => {
 			window.removeEventListener('mousemove', (event) =>
-				handleBoxPosition(event),
+				handleCursorPosition(event),
 			);
 		};
 	}, []);
 
-	useEffect(() => {
-		if (draggedItemMetadata) {
-			const newValue = {
-				[draggedItemMetadata.itemId]: {
-					//@ts-expect-error add types
-					...items.current[draggedItemMetadata.itemId],
-					isDragged: true,
-					posX: cursorPosition.x - draggedItemPositionDifference.x,
-					posY: cursorPosition.y - draggedItemPositionDifference.y,
-				},
-			};
-			items.current = {
-				...items.current,
-				...newValue,
-			};
-		}
-	}, [cursorPosition, draggedItemMetadata, draggedItemPositionDifference]);
+	const draggedItemId = useMemo(() => {
+		return Object.keys(draggedItemMetadata.draggedItem)[0];
+	}, [draggedItemMetadata.draggedItemInfo]);
 
-	const onDragItem = useCallback(
-		//TODO remove null
-		(id: string | null, x: number, y: number) => {
-			setDraggedItemPositionDifference({ x, y });
-			if (id) {
-				setDraggedItemMetadata({
-					itemId: id,
-					itemHeight: 100,
-					//@ts-expect-error add types for items
-					itemOrder: items.current[`${id}`].order,
-				});
-			}
-		},
-		[],
-	);
+	useEffect(() => {
+		if (draggedItemId) {
+			setDraggedItemMetadata({
+				...draggedItemMetadata,
+				draggedItem: {
+					[draggedItemId]: {
+						columnId: items[draggedItemId].columnId,
+						id: draggedItemId,
+						height: items[draggedItemId].height,
+						width: items[draggedItemId].width,
+						order: items[draggedItemId].order,
+						posX:
+							cursorPosition.x - draggedItemPositionDifference.x,
+						posY:
+							cursorPosition.y - draggedItemPositionDifference.y,
+					},
+				},
+			});
+		}
+	}, [cursorPosition]);
+
+	const onDragItem = useCallback(({ id, posX, posY }: onDragItemProps) => {
+		setDraggedItemPositionDifference({ x: posX, y: posY });
+		setDroppedItemMetadata({ droppedItemInfo: {} });
+
+		if (id) {
+			setDraggedItemMetadata({
+				draggedItem: {
+					[id]: {
+						columnId: items[id].columnId,
+						id: id,
+						height: items[id].height,
+						width: items[id].width,
+						order: items[id].order,
+						posX: 0,
+						posY: 0,
+					},
+				},
+				draggedItemInfo: {
+					columnId: items[id].columnId,
+					id: items[id].id,
+					width: 100,
+					height: 100,
+					order: items[id].order,
+				},
+			});
+		}
+	}, []);
 
 	const onDropItem = useCallback(
-		(id: string, columnId?: string, order?: number) => {
-			const newValue = {
-				[id]: {
-					//@ts-expect-error add types
-					...items.current[id],
-					isDragged: false,
-					posX: 0,
-					posY: 0,
-				},
-			};
-			items.current = {
-				...items.current,
-				...newValue,
-			};
+		({ id, columnId, order }: onDropItemProps) => {
+			if (columnId && order) {
+				const draggedItemOrder =
+					draggedItemMetadata.draggedItemInfo.order;
+
+				changeItemsPositionInfoAfterDropItem({
+					draggedItemId: id,
+					draggedItemOrder,
+					draggedItemTargetColumnId: columnId,
+					draggedItemTargetOrder: order,
+					items,
+					setItems,
+				});
+			}
 
 			setDraggedItemPositionDifference({ x: 0, y: 0 });
-			setDraggedItemMetadata(null);
-			// setDraggedItemId(null);
+
+			setDroppedItemMetadata({
+				droppedItemInfo: {
+					id,
+					...(!!draggedItemMetadata.draggedItemInfo.columnId && {
+						startPosition: {
+							columnId:
+								draggedItemMetadata.draggedItemInfo.columnId,
+							order:
+								draggedItemMetadata.draggedItemInfo.order || 0,
+						},
+					}),
+					...(!!columnId && {
+						targetPosition: { columnId, order: order || 0 },
+					}),
+				},
+			});
+
+			setDraggedItemMetadata({
+				draggedItem: {},
+				draggedItemInfo: {
+					columnId: undefined,
+					id: undefined,
+					width: undefined,
+					height: undefined,
+					order: undefined,
+				},
+			});
 		},
-		[],
+		[draggedItemMetadata.draggedItemInfo],
 	);
 
 	return {
-		items,
+		columnsOfItems,
 		onDragItem,
 		onDropItem,
-		// draggedItemId,
-		draggedItemMetadata,
 	};
 };

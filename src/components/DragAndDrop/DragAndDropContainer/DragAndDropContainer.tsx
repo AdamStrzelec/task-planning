@@ -1,161 +1,148 @@
-import React, { useState } from 'react';
-import { DragAndDropColumn } from '../DragAndDropColumn/DragAndDropColumn';
-import { DragAndDropItem } from '../DragAndDropItem/DragAndDropItem';
-import { DragAndDropHelpers } from '../helpers/DragAndDrop.helpers';
-import { useDragAndDrop } from '../hooks/useDragAndDrop';
+import React, { useState, useRef } from 'react';
+import { DragAndDropColumn } from 'src/components/DragAndDrop/DragAndDropColumn/DragAndDropColumn';
+import { useDragAndDrop } from 'src/components/DragAndDrop/hooks/useDragAndDrop';
+import { mockedItems } from 'src/components/DragAndDrop/mocks/mockedItems';
+import { createContext } from 'use-context-selector';
 
-export const DragAndDropContainer = () => {
-	const { items, onDragItem, onDropItem, draggedItemMetadata } =
-		useDragAndDrop();
-	const [slotNumber, setSlotNumber] = useState(0);
-	const { getSpaceForCurrentlyDraggedItem } = DragAndDropHelpers;
+export const DragAndDropContext = createContext<DragAndDropContextProps>({
+	items: {},
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	setItems: () => {},
+	draggedItemMetadata: {
+		draggedItem: {},
+		draggedItemInfo: {
+			id: undefined,
+			columnId: undefined,
+			width: undefined,
+			height: undefined,
+			order: undefined,
+		},
+	},
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	setDraggedItemMetadata: () => {},
+	droppedItemMetadata: { droppedItemInfo: {} },
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	setDroppedItemMetadata: () => {},
+});
+
+export const DragAndDropContainerComponent = () => {
+	const { columnsOfItems, onDragItem, onDropItem } = useDragAndDrop();
 
 	return (
-		<DragAndDropColumn
-			columnId={'1'}
-			items={items.current}
-			onDragItem={onDragItem}
-			onDropItem={onDropItem}
-			draggedItemMetadata={draggedItemMetadata}
-		/>
-		// <div style={{ position: 'relative' }}>
-		// 	<div
-		// 		style={{
-		// 			position: 'absolute',
-		// 			top: 0,
-		// 			left: 0,
-		// 			zIndex: draggedItemMetadata ? 100 : 120,
-		// 		}}
-		// 	>
-		// 		<DragAndDropItem
-		// 			id={'1'}
-		// 			posX={items.current['1'].posX}
-		// 			posY={items.current['1'].posY}
-		// 			color={items.current['1'].color}
-		// 			isDragged={items.current['1'].isDragged}
-		// 			onDragItem={onDragItem}
-		// 			onDropItem={onDropItem}
-		// 			spaceForDraggedItem={getSpaceForCurrentlyDraggedItem({
-		// 				itemOrder: items.current['1'].order,
-		// 				slotNumber,
-		// 				draggedItemHeight: draggedItemMetadata?.itemHeight,
-		// 				draggedItemOrder: draggedItemMetadata?.itemOrder,
-		// 			})}
-		// 		/>
-		// 		<DragAndDropItem
-		// 			id={'2'}
-		// 			posX={items.current['2'].posX}
-		// 			posY={items.current['2'].posY}
-		// 			color={items.current['2'].color}
-		// 			isDragged={items.current['2'].isDragged}
-		// 			onDragItem={onDragItem}
-		// 			onDropItem={onDropItem}
-		// 			spaceForDraggedItem={getSpaceForCurrentlyDraggedItem({
-		// 				itemOrder: items.current['2'].order,
-		// 				slotNumber,
-		// 				draggedItemHeight: draggedItemMetadata?.itemHeight,
-		// 				draggedItemOrder: draggedItemMetadata?.itemOrder,
-		// 			})}
-		// 		/>
-		// 		<DragAndDropItem
-		// 			id={'3'}
-		// 			posX={items.current['3'].posX}
-		// 			posY={items.current['3'].posY}
-		// 			color={items.current['3'].color}
-		// 			isDragged={items.current['3'].isDragged}
-		// 			onDragItem={onDragItem}
-		// 			onDropItem={onDropItem}
-		// 			spaceForDraggedItem={getSpaceForCurrentlyDraggedItem({
-		// 				itemOrder: items.current['3'].order,
-		// 				slotNumber,
-		// 				draggedItemHeight: draggedItemMetadata?.itemHeight,
-		// 				draggedItemOrder: draggedItemMetadata?.itemOrder,
-		// 			})}
-		// 		/>
-		// 		<DragAndDropItem
-		// 			id={'4'}
-		// 			posX={items.current['4'].posX}
-		// 			posY={items.current['4'].posY}
-		// 			color={items.current['4'].color}
-		// 			isDragged={items.current['4'].isDragged}
-		// 			onDragItem={onDragItem}
-		// 			onDropItem={onDropItem}
-		// 			spaceForDraggedItem={getSpaceForCurrentlyDraggedItem({
-		// 				itemOrder: items.current['4'].order,
-		// 				slotNumber,
-		// 				draggedItemHeight: draggedItemMetadata?.itemHeight,
-		// 				draggedItemOrder: draggedItemMetadata?.itemOrder,
-		// 			})}
-		// 		/>
-		// 		<DragAndDropItem
-		// 			id={'5'}
-		// 			posX={items.current['5'].posX}
-		// 			posY={items.current['5'].posY}
-		// 			color={items.current['5'].color}
-		// 			isDragged={items.current['5'].isDragged}
-		// 			onDragItem={onDragItem}
-		// 			onDropItem={onDropItem}
-		// 			spaceForDraggedItem={getSpaceForCurrentlyDraggedItem({
-		// 				itemOrder: items.current['5'].order,
-		// 				slotNumber,
-		// 				draggedItemHeight: draggedItemMetadata?.itemHeight,
-		// 				draggedItemOrder: draggedItemMetadata?.itemOrder,
-		// 			})}
-		// 		/>
-		// 	</div>
-		// 	<div
-		// 		onMouseLeave={() => setSlotNumber(0)}
-		// 		style={{
-		// 			position: 'absolute',
-		// 			top: 0,
-		// 			left: 0,
-		// 			zIndex: 101,
-		// 			backgroundColor: 'rgba(0, 0, 0, 0.3)',
-		// 		}}
-		// 	>
-		// 		<div
-		// 			onMouseOver={() => setSlotNumber(1)}
-		// 			style={{
-		// 				width: 100,
-		// 				height: 100,
-		// 			}}
-		// 		></div>
-		// 		<div
-		// 			onMouseOver={() => setSlotNumber(2)}
-		// 			style={{
-		// 				width: 100,
-		// 				height: 100,
-		// 			}}
-		// 		></div>
-		// 		<div
-		// 			onMouseOver={() => setSlotNumber(3)}
-		// 			style={{
-		// 				width: 100,
-		// 				height: 100,
-		// 			}}
-		// 		></div>
-		// 		<div
-		// 			onMouseOver={() => setSlotNumber(4)}
-		// 			style={{
-		// 				width: 100,
-		// 				height: 100,
-		// 			}}
-		// 		></div>
-		// 		<div
-		// 			onMouseOver={() => setSlotNumber(5)}
-		// 			style={{
-		// 				width: 100,
-		// 				height: 100,
-		// 			}}
-		// 		></div>
-		// 		<div
-		// 			onMouseOver={() => setSlotNumber(6)}
-		// 			style={{
-		// 				width: 100,
-		// 				height: 100,
-		// 			}}
-		// 		></div>
-		// 	</div>
-		// </div>
+		<div
+			style={{
+				display: 'grid',
+				gridTemplateColumns: '200px 200px 200px',
+			}}
+		>
+			<DragAndDropColumn
+				columnId={'1'}
+				items={columnsOfItems['1']}
+				onDragItem={onDragItem}
+				onDropItem={onDropItem}
+			/>
+			<DragAndDropColumn
+				columnId={'2'}
+				items={columnsOfItems['2']}
+				onDragItem={onDragItem}
+				onDropItem={onDropItem}
+			/>
+			<DragAndDropColumn
+				columnId={'3'}
+				items={columnsOfItems['3']}
+				onDragItem={onDragItem}
+				onDropItem={onDropItem}
+			/>
+		</div>
+	);
+};
+
+export type Items = Record<
+	string,
+	{
+		id: string;
+		columnId: string;
+		order: number;
+		isDragged: boolean;
+		color: string;
+		width: number;
+		height: number;
+	}
+>;
+
+type DraggedItemsMetadata = {
+	draggedItem: Record<
+		string,
+		{
+			id: string;
+			columnId: string;
+			order: number;
+			posX: number;
+			posY: number;
+			width: number;
+			height: number;
+		}
+	>;
+	draggedItemInfo: Partial<{
+		id: string;
+		columnId: string;
+		width: number;
+		height: number;
+		order: number;
+	}>;
+};
+
+type DroppedItemMetadata = {
+	droppedItemInfo: Partial<{
+		id: string;
+		startPosition: {
+			order: number;
+			columnId: string;
+		};
+		targetPosition: {
+			order: number;
+			columnId: string;
+		};
+	}>;
+};
+
+type DragAndDropContextProps = {
+	items: Items;
+	setItems: (items: Items) => void;
+	draggedItemMetadata: DraggedItemsMetadata;
+	setDraggedItemMetadata: (itemMetadata: DraggedItemsMetadata) => void;
+	droppedItemMetadata: DroppedItemMetadata;
+	setDroppedItemMetadata: (itemMetadata: DroppedItemMetadata) => void;
+};
+
+export const DragAndDropContainer = () => {
+	const items = useRef<Items>(mockedItems);
+	const [draggedItemMetadata, setDraggedItemMetadata] =
+		useState<DraggedItemsMetadata>({
+			draggedItem: {},
+			draggedItemInfo: {
+				id: undefined,
+				columnId: undefined,
+				width: undefined,
+				height: undefined,
+				order: undefined,
+			},
+		});
+	const [droppedItemMetadata, setDroppedItemMetadata] =
+		useState<DroppedItemMetadata>({ droppedItemInfo: {} });
+
+	return (
+		<DragAndDropContext.Provider
+			value={{
+				items: items.current,
+				setItems: (newItems: Items) => (items.current = newItems),
+				draggedItemMetadata,
+				setDraggedItemMetadata,
+				droppedItemMetadata,
+				setDroppedItemMetadata,
+			}}
+		>
+			<DragAndDropContainerComponent />
+		</DragAndDropContext.Provider>
 	);
 };

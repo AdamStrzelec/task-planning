@@ -4,11 +4,11 @@ module.exports = {
 		es2021: true,
 	},
 	extends: [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:react/recommended",
-        "plugin:storybook/recommended"
-    ],
+		'eslint:recommended',
+		'plugin:@typescript-eslint/recommended',
+		'plugin:react/recommended',
+		'plugin:storybook/recommended',
+	],
 	overrides: [
 		{
 			env: {
@@ -27,11 +27,7 @@ module.exports = {
 	},
 	plugins: ['@typescript-eslint', 'react', 'prettier'],
 	rules: {
-		indent: ['error', 'tab'],
+		indent: ['off'],
 		'prettier/prettier': [2, { useTabs: true }],
-		// indent: ["error", "tab"],
-		// "linebreak-style": ["error", "unix"],
-		// quotes: ["error", "single"],
-		// semi: ["error", "always"],
 	},
 };
