@@ -62,7 +62,12 @@ const DragAndDropColumnComponent = ({
 	return (
 		<div
 			onMouseDown={() => setIsMouseOver(true)}
-			style={{ position: 'relative' }}
+			style={{
+				position: 'relative',
+				minHeight: 700,
+				width: 100,
+				backgroundColor: 'gray',
+			}}
 		>
 			<div
 				style={{
@@ -113,6 +118,10 @@ const DragAndDropColumnComponent = ({
 					left: 0,
 					zIndex: 101,
 					backgroundColor: 'rgba(0, 0, 0, 0.3)',
+					width: '100%',
+					height: '100%',
+					display: 'flex',
+					flexFlow: 'column',
 				}}
 			>
 				{sortedItems.map((item, index) => (
@@ -127,10 +136,15 @@ const DragAndDropColumnComponent = ({
 					/>
 				))}
 				<div
-					onMouseOver={() => setSlotNumber(sortedItems.length + 1)}
+					onMouseOver={() => {
+						setSlotNumber(
+							draggedItemColumnId === columnId
+								? sortedItems.length
+								: sortedItems.length + 1,
+						);
+					}}
 					style={{
-						width: 100,
-						height: 100,
+						flexGrow: 1,
 					}}
 				></div>
 			</div>
