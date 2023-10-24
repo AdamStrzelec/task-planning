@@ -23,6 +23,12 @@ export const DragAndDropContext = createContext<DragAndDropContextProps>({
 	droppedItemMetadata: { droppedItemInfo: {} },
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	setDroppedItemMetadata: () => {},
+	slotsPositionDifference: {
+		posX: 0,
+		posY: 0,
+	},
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	setSlotsPositionDifference: () => {},
 });
 
 export const DragAndDropContainerComponent = () => {
@@ -106,6 +112,11 @@ type DroppedItemMetadata = {
 	}>;
 };
 
+type SlotsPositionDifference = {
+	posX: number;
+	posY: number;
+};
+
 type DragAndDropContextProps = {
 	items: Items;
 	setItems: (items: Items) => void;
@@ -113,6 +124,10 @@ type DragAndDropContextProps = {
 	setDraggedItemMetadata: (itemMetadata: DraggedItemsMetadata) => void;
 	droppedItemMetadata: DroppedItemMetadata;
 	setDroppedItemMetadata: (itemMetadata: DroppedItemMetadata) => void;
+	slotsPositionDifference: SlotsPositionDifference;
+	setSlotsPositionDifference: (
+		positionDifference: SlotsPositionDifference,
+	) => void;
 };
 
 export const DragAndDropContainer = () => {
@@ -130,6 +145,11 @@ export const DragAndDropContainer = () => {
 		});
 	const [droppedItemMetadata, setDroppedItemMetadata] =
 		useState<DroppedItemMetadata>({ droppedItemInfo: {} });
+	const [slotsPositionDifference, setSlotsPositionDifference] =
+		useState<SlotsPositionDifference>({
+			posX: 0,
+			posY: 0,
+		});
 
 	return (
 		<DragAndDropContext.Provider
@@ -140,6 +160,8 @@ export const DragAndDropContainer = () => {
 				setDraggedItemMetadata,
 				droppedItemMetadata,
 				setDroppedItemMetadata,
+				slotsPositionDifference,
+				setSlotsPositionDifference,
 			}}
 		>
 			<DragAndDropContainerComponent />

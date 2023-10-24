@@ -7,6 +7,10 @@ import {
 } from 'src/components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
 import { DragAndDropItem } from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
 import { DragAndDropHelpers } from 'src/components/DragAndDrop/helpers/DragAndDrop.helpers';
+import {
+	onDragItemProps,
+	onDropItemProps,
+} from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
 
 interface DragAndDropColumnProps {
 	columnId: string;
@@ -15,20 +19,12 @@ interface DragAndDropColumnProps {
 		id,
 		posX,
 		posY,
-	}: {
-		id: string;
-		posX: number;
-		posY: number;
-	}) => void;
-	onDropItem: ({
-		id,
-		columnId,
-		order,
-	}: {
-		id: string;
-		columnId?: string;
-		order?: number;
-	}) => void;
+		windowPositionX,
+		windowPositionY,
+		width,
+		height,
+	}: onDragItemProps) => void;
+	onDropItem: ({ id, columnId, order }: onDropItemProps) => void;
 }
 
 const DragAndDropColumnComponent = ({
@@ -54,6 +50,12 @@ const DragAndDropColumnComponent = ({
 		DragAndDropContext,
 		(state) => state.draggedItemMetadata.draggedItemInfo,
 	);
+
+	const { posX: slotPositionDiffX, posY: slotPositionDiffY } =
+		useContextSelector(
+			DragAndDropContext,
+			(state) => state.slotsPositionDifference,
+		);
 
 	const sortedItems = Object.keys(items)
 		.map((key) => items[key])
@@ -114,10 +116,10 @@ const DragAndDropColumnComponent = ({
 				}
 				style={{
 					position: 'absolute',
-					top: 0,
-					left: 0,
+					top: `${slotPositionDiffY}px`,
+					left: `${slotPositionDiffX}px`,
 					zIndex: 101,
-					backgroundColor: 'rgba(0, 0, 0, 0.3)',
+					// backgroundColor: 'rgba(0, 0, 0, 0.3)',
 					width: '100%',
 					height: '100%',
 					display: 'flex',
@@ -145,6 +147,7 @@ const DragAndDropColumnComponent = ({
 					}}
 					style={{
 						flexGrow: 1,
+						// border: '1px solid white',
 					}}
 				></div>
 			</div>
@@ -185,6 +188,7 @@ const ItemSlotComponent = ({
 			style={{
 				width,
 				height,
+				// border: '1px solid white',
 			}}
 		/>
 	);

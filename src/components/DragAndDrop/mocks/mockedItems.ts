@@ -6,7 +6,7 @@ export const mockedItems = {
 		isDragged: false,
 		color: 'orange',
 		width: 100,
-		height: 100,
+		height: 150,
 	},
 	'2': {
 		id: '2',
@@ -15,7 +15,7 @@ export const mockedItems = {
 		isDragged: false,
 		color: 'green',
 		width: 100,
-		height: 100,
+		height: 70,
 	},
 	'3': {
 		id: '3',

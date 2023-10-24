@@ -27,6 +27,7 @@ export const useDragAndDrop = () => {
 		setDraggedItemMetadata,
 		draggedItemMetadata,
 		setDroppedItemMetadata,
+		setSlotsPositionDifference,
 	} = useContextSelector(DragAndDropContext, (state) => state);
 
 	const columnsOfItems = useMemo(() => getColumnsOfItems(items), [items]);
@@ -72,33 +73,53 @@ export const useDragAndDrop = () => {
 		}
 	}, [cursorPosition]);
 
-	const onDragItem = useCallback(({ id, posX, posY }: onDragItemProps) => {
-		setDraggedItemPositionDifference({ x: posX, y: posY });
-		setDroppedItemMetadata({ droppedItemInfo: {} });
+	const onDragItem = useCallback(
+		({
+			id,
+			posX,
+			posY,
+			windowPositionX,
+			windowPositionY,
+			clickPositionX,
+			clickPositionY,
+			width,
+			height,
+		}: onDragItemProps) => {
+			setDraggedItemPositionDifference({ x: posX, y: posY });
+			setDroppedItemMetadata({ droppedItemInfo: {} });
 
-		if (id) {
-			setDraggedItemMetadata({
-				draggedItem: {
-					[id]: {
-						columnId: items[id].columnId,
-						id: id,
-						height: items[id].height,
-						width: items[id].width,
-						order: items[id].order,
-						posX: 0,
-						posY: 0,
-					},
-				},
-				draggedItemInfo: {
-					columnId: items[id].columnId,
-					id: items[id].id,
-					width: 100,
-					height: 100,
-					order: items[id].order,
-				},
+			const diffX = clickPositionX - windowPositionX - width / 2;
+			const diffY = clickPositionY - windowPositionY - height / 2;
+			setSlotsPositionDifference({
+				posX: diffX,
+				posY: diffY,
 			});
-		}
-	}, []);
+
+			if (id) {
+				setDraggedItemMetadata({
+					draggedItem: {
+						[id]: {
+							columnId: items[id].columnId,
+							id: id,
+							height: items[id].height,
+							width: items[id].width,
+							order: items[id].order,
+							posX: 0,
+							posY: 0,
+						},
+					},
+					draggedItemInfo: {
+						columnId: items[id].columnId,
+						id: items[id].id,
+						width: items[id].width,
+						height: items[id].height,
+						order: items[id].order,
+					},
+				});
+			}
+		},
+		[],
+	);
 
 	const onDropItem = useCallback(
 		({ id, columnId, order }: onDropItemProps) => {
@@ -144,6 +165,11 @@ export const useDragAndDrop = () => {
 					height: undefined,
 					order: undefined,
 				},
+			});
+
+			setSlotsPositionDifference({
+				posX: 0,
+				posY: 0,
 			});
 		},
 		[draggedItemMetadata.draggedItemInfo],
