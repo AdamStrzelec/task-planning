@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import { GlobalStyle } from './global/global.styles';
-import { DragAndDropContainer } from './components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
+import { DragAndDropProvider } from './components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 
 function App() {
 	return (
@@ -19,7 +19,7 @@ function App() {
 					paddingTop: 100,
 				}}
 			>
-				<DragAndDropContainer />
+				<DragAndDropProvider />
 			</div>
 		</div>
 	);

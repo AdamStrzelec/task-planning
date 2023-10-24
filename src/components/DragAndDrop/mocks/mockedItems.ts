@@ -1,7 +1,7 @@
 export const mockedItems = {
 	'1': {
 		id: '1',
-		columnId: '1',
+		containerId: '1',
 		order: 1,
 		isDragged: false,
 		color: 'orange',
@@ -10,7 +10,7 @@ export const mockedItems = {
 	},
 	'2': {
 		id: '2',
-		columnId: '1',
+		containerId: '1',
 		order: 2,
 		isDragged: false,
 		color: 'green',
@@ -19,7 +19,7 @@ export const mockedItems = {
 	},
 	'3': {
 		id: '3',
-		columnId: '1',
+		containerId: '1',
 		order: 3,
 		isDragged: false,
 		color: 'blue',
@@ -28,7 +28,7 @@ export const mockedItems = {
 	},
 	'4': {
 		id: '4',
-		columnId: '1',
+		containerId: '1',
 		order: 4,
 		isDragged: false,
 		color: 'yellow',
@@ -37,7 +37,7 @@ export const mockedItems = {
 	},
 	'5': {
 		id: '5',
-		columnId: '1',
+		containerId: '1',
 		order: 5,
 		isDragged: false,
 		color: 'red',
@@ -46,7 +46,7 @@ export const mockedItems = {
 	},
 	'6': {
 		id: '6',
-		columnId: '2',
+		containerId: '2',
 		order: 1,
 		isDragged: false,
 		color: 'pink',
@@ -55,7 +55,7 @@ export const mockedItems = {
 	},
 	'7': {
 		id: '7',
-		columnId: '2',
+		containerId: '2',
 		order: 2,
 		isDragged: false,
 		color: 'aqua',
@@ -64,7 +64,7 @@ export const mockedItems = {
 	},
 	'8': {
 		id: '8',
-		columnId: '2',
+		containerId: '2',
 		order: 3,
 		isDragged: false,
 		color: 'tomato',
@@ -73,7 +73,7 @@ export const mockedItems = {
 	},
 	'9': {
 		id: '9',
-		columnId: '2',
+		containerId: '2',
 		order: 4,
 		isDragged: false,
 		color: 'darkviolet',
@@ -82,7 +82,7 @@ export const mockedItems = {
 	},
 	'10': {
 		id: '10',
-		columnId: '3',
+		containerId: '3',
 		order: 1,
 		isDragged: false,
 		color: 'cadetblue',
@@ -91,7 +91,7 @@ export const mockedItems = {
 	},
 	'11': {
 		id: '11',
-		columnId: '3',
+		containerId: '3',
 		order: 2,
 		isDragged: false,
 		color: 'chartreuse',
@@ -100,7 +100,7 @@ export const mockedItems = {
 	},
 	'12': {
 		id: '12',
-		columnId: '3',
+		containerId: '3',
 		order: 3,
 		isDragged: false,
 		color: 'crimson',
@@ -109,7 +109,7 @@ export const mockedItems = {
 	},
 	'13': {
 		id: '13',
-		columnId: '3',
+		containerId: '3',
 		order: 4,
 		isDragged: false,
 		color: 'darkgray',
@@ -118,7 +118,7 @@ export const mockedItems = {
 	},
 	'14': {
 		id: '14',
-		columnId: '3',
+		containerId: '3',
 		order: 5,
 		isDragged: false,
 		color: 'brown',

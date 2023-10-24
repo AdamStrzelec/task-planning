@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState, useMemo } from 'react';
 import { useContextSelector } from 'use-context-selector';
-import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
+import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 import {
 	onDragItemProps,
 	onDropItemProps,
@@ -14,7 +14,7 @@ export interface DraggedItemMetadataProps {
 }
 
 export const useDragAndDrop = () => {
-	const { changeItemsPositionInfoAfterDropItem, getColumnsOfItems } =
+	const { changeItemsPositionInfoAfterDropItem, getContainersOfItems } =
 		DragAndDropHelpers;
 
 	const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
@@ -30,7 +30,10 @@ export const useDragAndDrop = () => {
 		setSlotsPositionDifference,
 	} = useContextSelector(DragAndDropContext, (state) => state);
 
-	const columnsOfItems = useMemo(() => getColumnsOfItems(items), [items]);
+	const containersOfItems = useMemo(
+		() => getContainersOfItems(items),
+		[items],
+	);
 
 	const handleCursorPosition = (event: MouseEvent) => {
 		setCursorPosition({ x: event.pageX, y: event.pageY });
@@ -58,7 +61,7 @@ export const useDragAndDrop = () => {
 				...draggedItemMetadata,
 				draggedItem: {
 					[draggedItemId]: {
-						columnId: items[draggedItemId].columnId,
+						containerId: items[draggedItemId].containerId,
 						id: draggedItemId,
 						height: items[draggedItemId].height,
 						width: items[draggedItemId].width,
@@ -99,7 +102,7 @@ export const useDragAndDrop = () => {
 				setDraggedItemMetadata({
 					draggedItem: {
 						[id]: {
-							columnId: items[id].columnId,
+							containerId: items[id].containerId,
 							id: id,
 							height: items[id].height,
 							width: items[id].width,
@@ -109,7 +112,7 @@ export const useDragAndDrop = () => {
 						},
 					},
 					draggedItemInfo: {
-						columnId: items[id].columnId,
+						containerId: items[id].containerId,
 						id: items[id].id,
 						width: items[id].width,
 						height: items[id].height,
@@ -122,15 +125,15 @@ export const useDragAndDrop = () => {
 	);
 
 	const onDropItem = useCallback(
-		({ id, columnId, order }: onDropItemProps) => {
-			if (columnId && order) {
+		({ id, containerId, order }: onDropItemProps) => {
+			if (containerId && order) {
 				const draggedItemOrder =
 					draggedItemMetadata.draggedItemInfo.order;
 
 				changeItemsPositionInfoAfterDropItem({
 					draggedItemId: id,
 					draggedItemOrder,
-					draggedItemTargetColumnId: columnId,
+					draggedItemTargetContainerId: containerId,
 					draggedItemTargetOrder: order,
 					items,
 					setItems,
@@ -142,16 +145,16 @@ export const useDragAndDrop = () => {
 			setDroppedItemMetadata({
 				droppedItemInfo: {
 					id,
-					...(!!draggedItemMetadata.draggedItemInfo.columnId && {
+					...(!!draggedItemMetadata.draggedItemInfo.containerId && {
 						startPosition: {
-							columnId:
-								draggedItemMetadata.draggedItemInfo.columnId,
+							containerId:
+								draggedItemMetadata.draggedItemInfo.containerId,
 							order:
 								draggedItemMetadata.draggedItemInfo.order || 0,
 						},
 					}),
-					...(!!columnId && {
-						targetPosition: { columnId, order: order || 0 },
+					...(!!containerId && {
+						targetPosition: { containerId, order: order || 0 },
 					}),
 				},
 			});
@@ -159,7 +162,7 @@ export const useDragAndDrop = () => {
 			setDraggedItemMetadata({
 				draggedItem: {},
 				draggedItemInfo: {
-					columnId: undefined,
+					containerId: undefined,
 					id: undefined,
 					width: undefined,
 					height: undefined,
@@ -176,7 +179,7 @@ export const useDragAndDrop = () => {
 	);
 
 	return {
-		columnsOfItems,
+		containersOfItems,
 		onDragItem,
 		onDropItem,
 	};

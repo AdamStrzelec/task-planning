@@ -1,29 +1,29 @@
-import { Items } from 'src/components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
+import { Items } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 
 const getSpaceForCurrentlyDraggedItem = ({
 	itemOrder,
 	draggedItemOrder = 0,
 	slotNumber,
 	draggedItemHeight = 0,
-	draggedItemColumnId,
-	columnId,
+	draggedItemContainerId,
+	containerId,
 	isMouseOver,
 }: {
 	itemOrder: number;
 	draggedItemOrder?: number;
 	slotNumber: number;
 	draggedItemHeight?: number;
-	draggedItemColumnId?: string;
-	columnId: string;
+	draggedItemContainerId?: string;
+	containerId: string;
 	isMouseOver: boolean;
 }) => {
-	if (!isMouseOver && draggedItemColumnId === columnId) {
+	if (!isMouseOver && draggedItemContainerId === containerId) {
 		if (draggedItemOrder < itemOrder) {
 			return -draggedItemHeight;
 		}
 	}
 
-	if (draggedItemColumnId && draggedItemColumnId === columnId) {
+	if (draggedItemContainerId && draggedItemContainerId === containerId) {
 		if (draggedItemOrder === itemOrder || slotNumber === 0) {
 			return 0;
 		}
@@ -36,8 +36,8 @@ const getSpaceForCurrentlyDraggedItem = ({
 	}
 
 	if (
-		draggedItemColumnId &&
-		draggedItemColumnId !== columnId &&
+		draggedItemContainerId &&
+		draggedItemContainerId !== containerId &&
 		isMouseOver
 	) {
 		if (slotNumber <= itemOrder) {
@@ -54,36 +54,36 @@ const changeItemsPositionInfoAfterDropItem = ({
 	draggedItemOrder,
 	draggedItemTargetOrder,
 	draggedItemId,
-	draggedItemTargetColumnId,
+	draggedItemTargetContainerId,
 }: {
 	items: Items;
 	setItems: (items: Items) => void;
 	draggedItemOrder?: number;
 	draggedItemTargetOrder: number;
 	draggedItemId: string;
-	draggedItemTargetColumnId: string;
+	draggedItemTargetContainerId: string;
 }) => {
 	const newItems = { ...items };
 
-	if (newItems[draggedItemId].columnId !== draggedItemTargetColumnId) {
+	if (newItems[draggedItemId].containerId !== draggedItemTargetContainerId) {
 		Object.keys(items).forEach((key) => {
-			if (items[key].columnId === draggedItemTargetColumnId) {
+			if (items[key].containerId === draggedItemTargetContainerId) {
 				if (items[key].order >= draggedItemTargetOrder) {
 					newItems[key].order += 1;
 				}
 			}
-			if (items[draggedItemId].columnId === items[key].columnId) {
+			if (items[draggedItemId].containerId === items[key].containerId) {
 				if (items[key].order > items[draggedItemId].order) {
 					newItems[key].order -= 1;
 				}
 			}
 		});
-		newItems[draggedItemId].columnId = draggedItemTargetColumnId;
+		newItems[draggedItemId].containerId = draggedItemTargetContainerId;
 		newItems[draggedItemId].order = draggedItemTargetOrder;
 	} else {
 		Object.keys(items).forEach((key) => {
 			if (
-				items[key].columnId === draggedItemTargetColumnId &&
+				items[key].containerId === draggedItemTargetContainerId &&
 				draggedItemOrder &&
 				draggedItemOrder < items[key].order &&
 				draggedItemTargetOrder >= items[key].order
@@ -92,7 +92,7 @@ const changeItemsPositionInfoAfterDropItem = ({
 			}
 
 			if (
-				items[key].columnId === draggedItemTargetColumnId &&
+				items[key].containerId === draggedItemTargetContainerId &&
 				draggedItemOrder &&
 				draggedItemOrder > items[key].order &&
 				draggedItemTargetOrder <= items[key].order
@@ -100,21 +100,23 @@ const changeItemsPositionInfoAfterDropItem = ({
 				newItems[key].order += 1;
 			}
 		});
-		newItems[draggedItemId].columnId = draggedItemTargetColumnId;
+		newItems[draggedItemId].containerId = draggedItemTargetContainerId;
 		newItems[draggedItemId].order = draggedItemTargetOrder;
 	}
 	setItems(newItems);
 };
 
-const getColumnsOfItems = <T extends Record<string, { columnId: string }>>(
+const getContainersOfItems = <
+	T extends Record<string, { containerId: string }>,
+>(
 	items: T,
 ) => {
 	const sortedColumns = Object.keys(items).reduce(
 		(accumulator, current) => ({
 			...{
 				...accumulator,
-				[items[current].columnId]: {
-					...accumulator[items[current].columnId],
+				[items[current].containerId]: {
+					...accumulator[items[current].containerId],
 					...{
 						[current]: items[current],
 					},
@@ -129,5 +131,5 @@ const getColumnsOfItems = <T extends Record<string, { columnId: string }>>(
 export const DragAndDropHelpers = {
 	getSpaceForCurrentlyDraggedItem,
 	changeItemsPositionInfoAfterDropItem,
-	getColumnsOfItems,
+	getContainersOfItems,
 };

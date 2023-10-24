@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
+import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 import { useContextSelector } from 'use-context-selector';
 import { isEmpty } from 'lodash';
 
@@ -18,7 +18,7 @@ export interface onDragItemProps {
 
 export interface onDropItemProps {
 	id: string;
-	columnId?: string;
+	containerId?: string;
 	order?: number;
 }
 
@@ -27,7 +27,7 @@ interface DragAndDropItemProps {
 	isDragged: boolean;
 	color: string;
 	onDragItem: ({ id, posX, posY }: onDragItemProps) => void;
-	onDropItem: ({ id, columnId, order }: onDropItemProps) => void;
+	onDropItem: ({ id, containerId, order }: onDropItemProps) => void;
 	spaceForDraggedItem?: number;
 }
 
@@ -58,7 +58,7 @@ export const DragAndDropItemComponent = ({
 
 	const {
 		id: itemId,
-		columnId,
+		containerId,
 		order,
 	} = useContextSelector(DragAndDropContext, (state) => state.items[id]);
 
@@ -74,7 +74,7 @@ export const DragAndDropItemComponent = ({
 	const shouldWrapperAnimate = () =>
 		(!!draggedItemId && draggedItemId !== id) ||
 		(!!droppedItemInfo.startPosition &&
-			droppedItemInfo.startPosition.columnId === columnId &&
+			droppedItemInfo.startPosition.containerId === containerId &&
 			!droppedItemInfo.targetPosition);
 
 	const shouldItemAnimate = () =>
@@ -107,10 +107,6 @@ export const DragAndDropItemComponent = ({
 				}}
 				isDragged={isDragged}
 				onMouseDown={(obj) => {
-					// const diffX =
-					// 	obj.pageX -
-					// 		itemRef.current?.getBoundingClientRect().width || 0;
-					// console.log(diffX);
 					onDragItem({
 						id,
 						posX: Math.abs(obj.pageX - x),
@@ -148,7 +144,7 @@ export const DragAndDropItemComponent = ({
 					}}
 				/>
 				{/* <p style={{ margin: 0, padding: 5 }}>id: {itemId}</p>
-				<p style={{ margin: 0, padding: 5 }}>col: {columnId}</p>
+				<p style={{ margin: 0, padding: 5 }}>col: {containerId}</p>
 				<p style={{ margin: 0, padding: 5 }}>order: {order}</p> */}
 			</DraggebleDiv>
 		</DraggableWrapper>
