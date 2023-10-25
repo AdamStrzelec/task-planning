@@ -17,8 +17,9 @@ import {
 
 export const DragAndDropContext = createContext<DragAndDropContextProps>({
 	items: {},
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	setItems: () => {},
+	setItems: () => {
+		/**/
+	},
 	draggedItemMetadata: {
 		draggedItem: {},
 		draggedItemInfo: {
@@ -29,30 +30,42 @@ export const DragAndDropContext = createContext<DragAndDropContextProps>({
 			order: undefined,
 		},
 	},
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	setDraggedItemMetadata: () => {},
+	setDraggedItemMetadata: () => {
+		/**/
+	},
 	droppedItemMetadata: { droppedItemInfo: {} },
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	setDroppedItemMetadata: () => {},
+	setDroppedItemMetadata: () => {
+		/**/
+	},
 	slotsPositionDifference: {
 		posX: 0,
 		posY: 0,
 	},
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	setSlotsPositionDifference: () => {},
+	setSlotsPositionDifference: () => {
+		/**/
+	},
 	draggedItemPositionDifference: {
 		posX: 0,
 		posY: 0,
 	},
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	setDraggedItemPositionDifference: () => {},
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	onDragItem: () => {},
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	onDropItem: () => {},
+	setDraggedItemPositionDifference: () => {
+		/**/
+	},
+	onDragItem: () => {
+		/**/
+	},
+	onDropItem: () => {
+		/**/
+	},
 });
 
-export const DragAndDropProviderComponent = () => {
+type DragAndDropProveiderComponentProps = {
+	children: React.ReactNode;
+};
+
+export const DragAndDropProviderComponent: React.FC<
+	DragAndDropProveiderComponentProps
+> = ({ children }) => {
 	const { containersOfItems } = useMousemove();
 
 	return (
@@ -74,6 +87,7 @@ export const DragAndDropProviderComponent = () => {
 				containerId={'3'}
 				items={containersOfItems['3']}
 			/>
+			{children}
 		</div>
 	);
 };
@@ -97,7 +111,13 @@ type DragAndDropContextProps = {
 	onDropItem: (props: onDropItemProps) => void;
 };
 
-export const DragAndDropProvider = () => {
+type DragAndDropProveiderProps = {
+	children: React.ReactNode;
+};
+
+export const DragAndDropProvider: React.FC<DragAndDropProveiderProps> = ({
+	children,
+}) => {
 	const {
 		draggedItemMetadata,
 		draggedItemPositionDifference,
@@ -130,7 +150,9 @@ export const DragAndDropProvider = () => {
 				onDropItem,
 			}}
 		>
-			<DragAndDropProviderComponent />
+			<DragAndDropProviderComponent>
+				{children}
+			</DragAndDropProviderComponent>
 		</DragAndDropContext.Provider>
 	);
 };

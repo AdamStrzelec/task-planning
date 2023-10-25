@@ -19,7 +19,9 @@ function App() {
 					paddingTop: 100,
 				}}
 			>
-				<DragAndDropProvider />
+				<DragAndDropProvider>
+					<p>siema</p>
+				</DragAndDropProvider>
 			</div>
 		</div>
 	);

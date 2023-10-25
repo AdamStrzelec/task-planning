@@ -3,6 +3,8 @@ import styled, { css } from 'styled-components';
 import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 import { useContextSelector } from 'use-context-selector';
 import { isEmpty } from 'lodash';
+import { DragAndDropContainerContext } from '../DragAndDropContainer/DragAndDropContainer';
+import { DragAndDropHelpers } from '../helpers/DragAndDrop.helpers';
 
 export interface onDragItemProps {
 	id: string;
@@ -24,15 +26,14 @@ export interface onDropItemProps {
 
 interface DragAndDropItemProps {
 	id: string;
-	isDragged: boolean;
 	color: string;
-	spaceForDraggedItem?: number;
+	children?: React.ReactNode;
 }
 
 export const DragAndDropItemComponent = ({
 	id,
 	color,
-	spaceForDraggedItem = 0,
+	children,
 }: DragAndDropItemProps) => {
 	const { width, height } = useContextSelector(
 		DragAndDropContext,
@@ -68,7 +69,12 @@ export const DragAndDropItemComponent = ({
 		order,
 	} = useContextSelector(DragAndDropContext, (state) => state.items[id]);
 
-	const { id: draggedItemId } = useContextSelector(
+	const {
+		id: draggedItemId,
+		order: draggedItemOrder,
+		containerId: draggedItemContainerId,
+		height: draggedItemHeight,
+	} = useContextSelector(
 		DragAndDropContext,
 		(state) => state.draggedItemMetadata.draggedItemInfo,
 	);
@@ -92,9 +98,27 @@ export const DragAndDropItemComponent = ({
 
 	const itemRef = useRef<HTMLDivElement>(null);
 
+	const {
+		isMouseOver,
+		containerId: contId,
+		slotNumber,
+	} = useContextSelector(DragAndDropContainerContext, (state) => state);
+
+	console.log(isMouseOver + ' ' + contId);
+
+	const { getSpaceForCurrentlyDraggedItem } = DragAndDropHelpers;
+
 	return (
 		<DraggableWrapper
-			spaceForDraggedItem={spaceForDraggedItem}
+			spaceForDraggedItem={getSpaceForCurrentlyDraggedItem({
+				itemOrder: order,
+				slotNumber,
+				draggedItemHeight,
+				draggedItemOrder,
+				draggedItemContainerId,
+				containerId: contId || '',
+				isMouseOver,
+			})}
 			isDragged={isDragged}
 			shouldAnimate={shouldWrapperAnimate()}
 		>
@@ -138,17 +162,7 @@ export const DragAndDropItemComponent = ({
 					});
 				}}
 			>
-				<div
-					style={{
-						width: '5px',
-						height: '5px',
-						backgroundColor: 'black',
-						position: 'absolute',
-						top: '50%',
-						left: '50%',
-						transform: 'translate3d(-50%, -50%, 0)',
-					}}
-				/>
+				{children}
 				{/* <p style={{ margin: 0, padding: 5 }}>id: {itemId}</p>
 				<p style={{ margin: 0, padding: 5 }}>col: {containerId}</p>
 				<p style={{ margin: 0, padding: 5 }}>order: {order}</p> */}
