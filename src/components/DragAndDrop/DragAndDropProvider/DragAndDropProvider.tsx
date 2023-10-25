@@ -1,8 +1,19 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { DragAndDropContainer } from 'src/components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
-import { useDragAndDrop } from 'src/components/DragAndDrop/hooks/useDragAndDrop';
-import { mockedItems } from 'src/components/DragAndDrop/mocks/mockedItems';
+import { useMousemove } from 'src/components/DragAndDrop/hooks/useMousemove';
 import { createContext } from 'use-context-selector';
+import {
+	onDragItemProps,
+	onDropItemProps,
+} from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
+import {
+	DraggedItemPositionDifference,
+	DraggedItemsMetadata,
+	DroppedItemMetadata,
+	Items,
+	SlotsPositionDifference,
+	useDragAndDrop,
+} from 'src/components/DragAndDrop/hooks/useDragAndDrop';
 
 export const DragAndDropContext = createContext<DragAndDropContextProps>({
 	items: {},
@@ -29,10 +40,20 @@ export const DragAndDropContext = createContext<DragAndDropContextProps>({
 	},
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	setSlotsPositionDifference: () => {},
+	draggedItemPositionDifference: {
+		posX: 0,
+		posY: 0,
+	},
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	setDraggedItemPositionDifference: () => {},
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	onDragItem: () => {},
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	onDropItem: () => {},
 });
 
 export const DragAndDropProviderComponent = () => {
-	const { containersOfItems, onDragItem, onDropItem } = useDragAndDrop();
+	const { containersOfItems } = useMousemove();
 
 	return (
 		<div
@@ -44,77 +65,17 @@ export const DragAndDropProviderComponent = () => {
 			<DragAndDropContainer
 				containerId={'1'}
 				items={containersOfItems['1']}
-				onDragItem={onDragItem}
-				onDropItem={onDropItem}
 			/>
 			<DragAndDropContainer
 				containerId={'2'}
 				items={containersOfItems['2']}
-				onDragItem={onDragItem}
-				onDropItem={onDropItem}
 			/>
 			<DragAndDropContainer
 				containerId={'3'}
 				items={containersOfItems['3']}
-				onDragItem={onDragItem}
-				onDropItem={onDropItem}
 			/>
 		</div>
 	);
-};
-
-export type Items = Record<
-	string,
-	{
-		id: string;
-		containerId: string;
-		order: number;
-		isDragged: boolean;
-		color: string;
-		width: number;
-		height: number;
-	}
->;
-
-type DraggedItemsMetadata = {
-	draggedItem: Record<
-		string,
-		{
-			id: string;
-			containerId: string;
-			order: number;
-			posX: number;
-			posY: number;
-			width: number;
-			height: number;
-		}
-	>;
-	draggedItemInfo: Partial<{
-		id: string;
-		containerId: string;
-		width: number;
-		height: number;
-		order: number;
-	}>;
-};
-
-type DroppedItemMetadata = {
-	droppedItemInfo: Partial<{
-		id: string;
-		startPosition: {
-			order: number;
-			containerId: string;
-		};
-		targetPosition: {
-			order: number;
-			containerId: string;
-		};
-	}>;
-};
-
-type SlotsPositionDifference = {
-	posX: number;
-	posY: number;
 };
 
 type DragAndDropContextProps = {
@@ -128,40 +89,45 @@ type DragAndDropContextProps = {
 	setSlotsPositionDifference: (
 		positionDifference: SlotsPositionDifference,
 	) => void;
+	draggedItemPositionDifference: DraggedItemPositionDifference;
+	setDraggedItemPositionDifference: (
+		positionDifference: DraggedItemPositionDifference,
+	) => void;
+	onDragItem: (props: onDragItemProps) => void;
+	onDropItem: (props: onDropItemProps) => void;
 };
 
 export const DragAndDropProvider = () => {
-	const items = useRef<Items>(mockedItems);
-	const [draggedItemMetadata, setDraggedItemMetadata] =
-		useState<DraggedItemsMetadata>({
-			draggedItem: {},
-			draggedItemInfo: {
-				id: undefined,
-				containerId: undefined,
-				width: undefined,
-				height: undefined,
-				order: undefined,
-			},
-		});
-	const [droppedItemMetadata, setDroppedItemMetadata] =
-		useState<DroppedItemMetadata>({ droppedItemInfo: {} });
-	const [slotsPositionDifference, setSlotsPositionDifference] =
-		useState<SlotsPositionDifference>({
-			posX: 0,
-			posY: 0,
-		});
+	const {
+		draggedItemMetadata,
+		draggedItemPositionDifference,
+		droppedItemMetadata,
+		items,
+		onDragItem,
+		onDropItem,
+		setItems,
+		slotsPositionDifference,
+		setDraggedItemMetadata,
+		setDraggedItemPositionDifference,
+		setDroppedItemMetadata,
+		setSlotsPositionDifference,
+	} = useDragAndDrop();
 
 	return (
 		<DragAndDropContext.Provider
 			value={{
-				items: items.current,
-				setItems: (newItems: Items) => (items.current = newItems),
+				items,
+				setItems,
 				draggedItemMetadata,
 				setDraggedItemMetadata,
 				droppedItemMetadata,
 				setDroppedItemMetadata,
 				slotsPositionDifference,
 				setSlotsPositionDifference,
+				draggedItemPositionDifference,
+				setDraggedItemPositionDifference,
+				onDragItem,
+				onDropItem,
 			}}
 		>
 			<DragAndDropProviderComponent />

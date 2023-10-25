@@ -1,4 +1,4 @@
-import { Items } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
+import { Items } from 'src/components/DragAndDrop/hooks/useDragAndDrop';
 
 const getSpaceForCurrentlyDraggedItem = ({
 	itemOrder,

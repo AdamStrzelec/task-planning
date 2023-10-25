@@ -26,16 +26,12 @@ interface DragAndDropItemProps {
 	id: string;
 	isDragged: boolean;
 	color: string;
-	onDragItem: ({ id, posX, posY }: onDragItemProps) => void;
-	onDropItem: ({ id, containerId, order }: onDropItemProps) => void;
 	spaceForDraggedItem?: number;
 }
 
 export const DragAndDropItemComponent = ({
 	id,
 	color,
-	onDragItem,
-	onDropItem,
 	spaceForDraggedItem = 0,
 }: DragAndDropItemProps) => {
 	const { width, height } = useContextSelector(
@@ -44,6 +40,16 @@ export const DragAndDropItemComponent = ({
 	);
 
 	//TODO zaimplementować funkcję która będzie zmieniało width i height z poziomu itemu na podstawie children
+
+	const onDragItem = useContextSelector(
+		DragAndDropContext,
+		(state) => state.onDragItem,
+	);
+
+	const onDropItem = useContextSelector(
+		DragAndDropContext,
+		(state) => state.onDropItem,
+	);
 
 	const x =
 		useContextSelector(

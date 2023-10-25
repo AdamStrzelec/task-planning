@@ -1,80 +1,95 @@
-import { useEffect, useCallback, useState, useMemo } from 'react';
-import { useContextSelector } from 'use-context-selector';
-import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
+import { useState, useCallback } from 'react';
 import {
 	onDragItemProps,
 	onDropItemProps,
 } from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
 import { DragAndDropHelpers } from 'src/components/DragAndDrop/helpers/DragAndDrop.helpers';
+import { mockedItems } from 'src/components/DragAndDrop/mocks/mockedItems';
 
-export interface DraggedItemMetadataProps {
-	itemId: string;
-	itemHeight: number;
-	itemOrder: number;
-}
+export type Items = Record<
+	string,
+	{
+		id: string;
+		containerId: string;
+		order: number;
+		isDragged: boolean;
+		color: string;
+		width: number;
+		height: number;
+	}
+>;
+
+export type DraggedItemsMetadata = {
+	draggedItem: Record<
+		string,
+		{
+			id: string;
+			containerId: string;
+			order: number;
+			posX: number;
+			posY: number;
+			width: number;
+			height: number;
+		}
+	>;
+	draggedItemInfo: Partial<{
+		id: string;
+		containerId: string;
+		width: number;
+		height: number;
+		order: number;
+	}>;
+};
+
+export type DroppedItemMetadata = {
+	droppedItemInfo: Partial<{
+		id: string;
+		startPosition: {
+			order: number;
+			containerId: string;
+		};
+		targetPosition: {
+			order: number;
+			containerId: string;
+		};
+	}>;
+};
+
+export type SlotsPositionDifference = {
+	posX: number;
+	posY: number;
+};
+
+export type DraggedItemPositionDifference = {
+	posX: number;
+	posY: number;
+};
 
 export const useDragAndDrop = () => {
-	const { changeItemsPositionInfoAfterDropItem, getContainersOfItems } =
-		DragAndDropHelpers;
+	const [items, setItems] = useState<Items>(mockedItems);
+	const [draggedItemMetadata, setDraggedItemMetadata] =
+		useState<DraggedItemsMetadata>({
+			draggedItem: {},
+			draggedItemInfo: {
+				id: undefined,
+				containerId: undefined,
+				width: undefined,
+				height: undefined,
+				order: undefined,
+			},
+		});
+	const [droppedItemMetadata, setDroppedItemMetadata] =
+		useState<DroppedItemMetadata>({ droppedItemInfo: {} });
+	const [slotsPositionDifference, setSlotsPositionDifference] =
+		useState<SlotsPositionDifference>({
+			posX: 0,
+			posY: 0,
+		});
 
-	const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
 	const [draggedItemPositionDifference, setDraggedItemPositionDifference] =
-		useState({ x: 0, y: 0 });
+		useState<DraggedItemPositionDifference>({ posX: 0, posY: 0 });
 
-	const {
-		items,
-		setItems,
-		setDraggedItemMetadata,
-		draggedItemMetadata,
-		setDroppedItemMetadata,
-		setSlotsPositionDifference,
-	} = useContextSelector(DragAndDropContext, (state) => state);
-
-	const containersOfItems = useMemo(
-		() => getContainersOfItems(items),
-		[items],
-	);
-
-	const handleCursorPosition = (event: MouseEvent) => {
-		setCursorPosition({ x: event.pageX, y: event.pageY });
-	};
-
-	useEffect(() => {
-		window.addEventListener('mousemove', (event) =>
-			handleCursorPosition(event),
-		);
-
-		return () => {
-			window.removeEventListener('mousemove', (event) =>
-				handleCursorPosition(event),
-			);
-		};
-	}, []);
-
-	const draggedItemId = useMemo(() => {
-		return Object.keys(draggedItemMetadata.draggedItem)[0];
-	}, [draggedItemMetadata.draggedItemInfo]);
-
-	useEffect(() => {
-		if (draggedItemId) {
-			setDraggedItemMetadata({
-				...draggedItemMetadata,
-				draggedItem: {
-					[draggedItemId]: {
-						containerId: items[draggedItemId].containerId,
-						id: draggedItemId,
-						height: items[draggedItemId].height,
-						width: items[draggedItemId].width,
-						order: items[draggedItemId].order,
-						posX:
-							cursorPosition.x - draggedItemPositionDifference.x,
-						posY:
-							cursorPosition.y - draggedItemPositionDifference.y,
-					},
-				},
-			});
-		}
-	}, [cursorPosition]);
+	const { changeItemsPositionInfoAfterDropItem } = DragAndDropHelpers;
 
 	const onDragItem = useCallback(
 		({
@@ -88,11 +103,12 @@ export const useDragAndDrop = () => {
 			width,
 			height,
 		}: onDragItemProps) => {
-			setDraggedItemPositionDifference({ x: posX, y: posY });
+			setDraggedItemPositionDifference({ posX, posY });
 			setDroppedItemMetadata({ droppedItemInfo: {} });
 
 			const diffX = clickPositionX - windowPositionX - width / 2;
 			const diffY = clickPositionY - windowPositionY - height / 2;
+
 			setSlotsPositionDifference({
 				posX: diffX,
 				posY: diffY,
@@ -140,7 +156,7 @@ export const useDragAndDrop = () => {
 				});
 			}
 
-			setDraggedItemPositionDifference({ x: 0, y: 0 });
+			setDraggedItemPositionDifference({ posX: 0, posY: 0 });
 
 			setDroppedItemMetadata({
 				droppedItemInfo: {
@@ -179,8 +195,17 @@ export const useDragAndDrop = () => {
 	);
 
 	return {
-		containersOfItems,
+		items,
+		setItems,
 		onDragItem,
 		onDropItem,
+		draggedItemMetadata,
+		droppedItemMetadata,
+		slotsPositionDifference,
+		draggedItemPositionDifference,
+		setDraggedItemMetadata,
+		setDroppedItemMetadata,
+		setSlotsPositionDifference,
+		setDraggedItemPositionDifference,
 	};
 };

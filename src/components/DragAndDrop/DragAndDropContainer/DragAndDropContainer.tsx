@@ -1,37 +1,19 @@
-import { isEqual } from 'lodash';
+import { isEqual, isEmpty } from 'lodash';
 import React, { useCallback, useState } from 'react';
 import { useContextSelector } from 'use-context-selector';
-import {
-	DragAndDropContext,
-	Items,
-} from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
+import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 import { DragAndDropItem } from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
 import { DragAndDropHelpers } from 'src/components/DragAndDrop/helpers/DragAndDrop.helpers';
-import {
-	onDragItemProps,
-	onDropItemProps,
-} from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
+import { Items } from 'src/components/DragAndDrop/hooks/useDragAndDrop';
 
 interface DragAndDropContainerProps {
 	containerId: string;
 	items: Items;
-	onDragItem: ({
-		id,
-		posX,
-		posY,
-		windowPositionX,
-		windowPositionY,
-		width,
-		height,
-	}: onDragItemProps) => void;
-	onDropItem: ({ id, containerId, order }: onDropItemProps) => void;
 }
 
 const DragAndDropContainerComponent = ({
 	containerId,
 	items,
-	onDragItem,
-	onDropItem,
 }: DragAndDropContainerProps) => {
 	const [slotNumber, setSlotNumber] = useState(0);
 	const [isMouseOver, setIsMouseOver] = useState(false);
@@ -57,9 +39,16 @@ const DragAndDropContainerComponent = ({
 			(state) => state.slotsPositionDifference,
 		);
 
-	const sortedItems = Object.keys(items)
-		.map((key) => items[key])
-		.sort((a, b) => a.order - b.order);
+	const onDropItem = useContextSelector(
+		DragAndDropContext,
+		(state) => state.onDropItem,
+	);
+
+	const sortedItems = !isEmpty(items)
+		? Object.keys(items)
+				.map((key) => items[key])
+				.sort((a, b) => a.order - b.order)
+		: [];
 
 	return (
 		<div
@@ -85,8 +74,6 @@ const DragAndDropContainerComponent = ({
 						id={item.id}
 						color={item.color}
 						isDragged={item.isDragged}
-						onDragItem={onDragItem}
-						onDropItem={onDropItem}
 						spaceForDraggedItem={getSpaceForCurrentlyDraggedItem({
 							itemOrder: item.order,
 							slotNumber,
@@ -201,9 +188,7 @@ export const DragAndDropContainer = React.memo(
 	(prevProps, newProps) => {
 		return (
 			prevProps.containerId === newProps.containerId &&
-			isEqual(prevProps.items, newProps.items) &&
-			prevProps.onDragItem === newProps.onDragItem &&
-			prevProps.onDropItem === newProps.onDropItem
+			isEqual(prevProps.items, newProps.items)
 		);
 	},
 );
