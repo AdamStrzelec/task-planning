@@ -1,5 +1,4 @@
 import React from 'react';
-import { DragAndDropContainer } from 'src/components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
 import { useMousemove } from 'src/components/DragAndDrop/hooks/useMousemove';
 import { createContext } from 'use-context-selector';
 import {
@@ -66,30 +65,9 @@ type DragAndDropProveiderComponentProps = {
 export const DragAndDropProviderComponent: React.FC<
 	DragAndDropProveiderComponentProps
 > = ({ children }) => {
-	const { containersOfItems } = useMousemove();
+	useMousemove();
 
-	return (
-		<div
-			style={{
-				display: 'grid',
-				gridTemplateColumns: '200px 200px 200px',
-			}}
-		>
-			<DragAndDropContainer
-				containerId={'1'}
-				items={containersOfItems['1']}
-			/>
-			<DragAndDropContainer
-				containerId={'2'}
-				items={containersOfItems['2']}
-			/>
-			<DragAndDropContainer
-				containerId={'3'}
-				items={containersOfItems['3']}
-			/>
-			{children}
-		</div>
-	);
+	return <>{children}</>;
 };
 
 type DragAndDropContextProps = {

@@ -1,15 +1,23 @@
-import { isEqual, isEmpty } from 'lodash';
-import React, { useCallback, useState } from 'react';
+import { isEmpty } from 'lodash';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useContextSelector } from 'use-context-selector';
 import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
-import { DragAndDropItem } from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
-import { Items } from 'src/components/DragAndDrop/hooks/useDragAndDrop';
 import { createContext } from 'use-context-selector';
+import { DragAndDropHelpers } from '../helpers/DragAndDrop.helpers';
 
 interface DragAndDropContainerProps {
 	containerId: string;
-	items: Items;
-	children?: React.ReactNode;
+	children: (
+		items: {
+			id: string;
+			containerId: string;
+			order: number;
+			isDragged: boolean;
+			color: string;
+			width: number;
+			height: number;
+		}[],
+	) => React.ReactNode;
 }
 
 type DragAndDropContainerContextProps = {
@@ -27,7 +35,6 @@ export const DragAndDropContainerContext =
 
 const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 	containerId,
-	items,
 	children,
 }) => {
 	const [slotNumber, setSlotNumber] = useState(0);
@@ -54,8 +61,20 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 		(state) => state.onDropItem,
 	);
 
-	const sortedItems = !isEmpty(items)
-		? Object.keys(items)
+	const { getContainersOfItems } = DragAndDropHelpers;
+
+	const items = useContextSelector(
+		DragAndDropContext,
+		(state) => state.items,
+	);
+
+	const containersOfItems = useMemo(
+		() => getContainersOfItems(items),
+		[items],
+	);
+
+	const sortedItems = !isEmpty(containersOfItems[containerId])
+		? Object.keys(containersOfItems[containerId])
 				.map((key) => items[key])
 				.sort((a, b) => a.order - b.order)
 		: [];
@@ -81,15 +100,7 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 						zIndex: draggedItemId ? 100 : 120,
 					}}
 				>
-					{sortedItems.map((item) => (
-						<DragAndDropItem
-							key={item.id}
-							id={item.id}
-							color={item.color}
-						>
-							<p style={{ margin: 0 }}>{item.color}</p>
-						</DragAndDropItem>
-					))}
+					{children(sortedItems)}
 				</div>
 				<div
 					onMouseOver={() => {
@@ -139,7 +150,6 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 						}}
 						style={{
 							flexGrow: 1,
-							// border: '1px solid white',
 						}}
 					></div>
 				</div>
@@ -192,9 +202,6 @@ const ItemSlot = React.memo(ItemSlotComponent);
 export const DragAndDropContainer = React.memo(
 	DragAndDropContainerComponent,
 	(prevProps, newProps) => {
-		return (
-			prevProps.containerId === newProps.containerId &&
-			isEqual(prevProps.items, newProps.items)
-		);
+		return prevProps.containerId === newProps.containerId;
 	},
 );
