@@ -42,7 +42,7 @@ function App() {
 												style={{
 													margin: 0,
 													width: 100,
-													height: 70,
+													height: 100,
 												}}
 											>
 												{item.color}
@@ -65,7 +65,7 @@ function App() {
 												style={{
 													margin: 0,
 													width: 100,
-													height: 70,
+													height: 100,
 												}}
 											>
 												{item.color}
@@ -88,7 +88,7 @@ function App() {
 												style={{
 													margin: 0,
 													width: 100,
-													height: 70,
+													height: 100,
 												}}
 											>
 												{item.color}

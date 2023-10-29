@@ -5,8 +5,10 @@ import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvid
 import { createContext } from 'use-context-selector';
 import { DragAndDropHelpers } from '../helpers/DragAndDrop.helpers';
 
+type ContainerDirection = 'row' | 'column';
 interface DragAndDropContainerProps {
 	containerId: string;
+	direction?: ContainerDirection;
 	children: (
 		items: {
 			id: string;
@@ -23,6 +25,7 @@ type DragAndDropContainerContextProps = {
 	containerId?: string;
 	isMouseOver: boolean;
 	slotNumber: number;
+	direction: ContainerDirection;
 };
 
 export const DragAndDropContainerContext =
@@ -30,10 +33,12 @@ export const DragAndDropContainerContext =
 		containerId: undefined,
 		isMouseOver: false,
 		slotNumber: 0,
+		direction: 'column',
 	});
 
 const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 	containerId,
+	direction = 'column',
 	children,
 }) => {
 	const [slotNumber, setSlotNumber] = useState(0);
@@ -80,13 +85,13 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 
 	return (
 		<DragAndDropContainerContext.Provider
-			value={{ containerId, isMouseOver, slotNumber }}
+			value={{ containerId, isMouseOver, slotNumber, direction }}
 		>
 			<div
 				onMouseDown={() => setIsMouseOver(true)}
 				style={{
 					position: 'relative',
-					minHeight: 700,
+					height: 700,
 					width: 100,
 					backgroundColor: 'gray',
 				}}
@@ -97,6 +102,8 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 						top: 0,
 						left: 0,
 						zIndex: draggedItemId ? 100 : 120,
+						display: 'flex',
+						flexDirection: direction,
 					}}
 				>
 					{children(sortedItems)}
@@ -117,7 +124,7 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 						})
 					}
 					style={{
-						position: 'absolute',
+						position: 'relative',
 						top: `${slotPositionDiffY}px`,
 						left: `${slotPositionDiffX}px`,
 						zIndex: 101,
@@ -125,7 +132,7 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 						width: '100%',
 						height: '100%',
 						display: 'flex',
-						flexFlow: 'column',
+						flexFlow: direction,
 					}}
 				>
 					{sortedItems.map((item, index) => (

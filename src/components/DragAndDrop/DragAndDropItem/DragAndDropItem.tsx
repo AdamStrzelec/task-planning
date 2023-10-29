@@ -80,17 +80,17 @@ export const DragAndDropItemComponent = ({
 			(state) => state.draggedItemMetadata.draggedItem[id]?.posY,
 		) || 0;
 
-	const {
-		id: itemId,
-		containerId,
-		order,
-	} = useContextSelector(DragAndDropContext, (state) => state.items[id]);
+	const { containerId, order } = useContextSelector(
+		DragAndDropContext,
+		(state) => state.items[id],
+	);
 
 	const {
 		id: draggedItemId,
 		order: draggedItemOrder,
 		containerId: draggedItemContainerId,
 		height: draggedItemHeight,
+		width: draggedItemWidth,
 	} = useContextSelector(
 		DragAndDropContext,
 		(state) => state.draggedItemMetadata.draggedItemInfo,
@@ -117,6 +117,7 @@ export const DragAndDropItemComponent = ({
 		isMouseOver,
 		containerId: contId,
 		slotNumber,
+		direction,
 	} = useContextSelector(DragAndDropContainerContext, (state) => state);
 
 	const { getSpaceForCurrentlyDraggedItem } = DragAndDropHelpers;
@@ -126,12 +127,16 @@ export const DragAndDropItemComponent = ({
 			spaceForDraggedItem={getSpaceForCurrentlyDraggedItem({
 				itemOrder: order,
 				slotNumber,
-				draggedItemHeight,
+				draggedItemSize:
+					direction === 'column'
+						? draggedItemHeight
+						: draggedItemWidth,
 				draggedItemOrder,
 				draggedItemContainerId,
 				containerId: contId || '',
 				isMouseOver,
 			})}
+			direction={direction}
 			isDragged={isDragged}
 			shouldAnimate={shouldWrapperAnimate()}
 		>
@@ -194,14 +199,20 @@ const DraggableWrapper = styled.div<{
 	spaceForDraggedItem: number;
 	isDragged?: boolean;
 	shouldAnimate: boolean;
+	direction: 'column' | 'row';
 }>(
-	({ spaceForDraggedItem, isDragged, shouldAnimate }) => css`
+	({ spaceForDraggedItem, isDragged, shouldAnimate, direction }) => css`
 		${shouldAnimate &&
 		css`
 			transition: transform 0.3s ease-in-out;
 		`}
-
-		transform: translateY(${spaceForDraggedItem}px);
+		${direction === 'column'
+			? css`
+					transform: translateY(${spaceForDraggedItem}px);
+			  `
+			: css`
+					transform: translateX(${spaceForDraggedItem}px);
+			  `}
 		position: relative;
 		z-index: ${isDragged ? 10 : 1};
 	`,

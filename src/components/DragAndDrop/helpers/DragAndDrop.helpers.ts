@@ -4,7 +4,7 @@ const getSpaceForCurrentlyDraggedItem = ({
 	itemOrder,
 	draggedItemOrder = 0,
 	slotNumber,
-	draggedItemHeight = 0,
+	draggedItemSize = 0,
 	draggedItemContainerId,
 	containerId,
 	isMouseOver,
@@ -12,14 +12,14 @@ const getSpaceForCurrentlyDraggedItem = ({
 	itemOrder: number;
 	draggedItemOrder?: number;
 	slotNumber: number;
-	draggedItemHeight?: number;
+	draggedItemSize?: number;
 	draggedItemContainerId?: string;
 	containerId: string;
 	isMouseOver: boolean;
 }) => {
 	if (!isMouseOver && draggedItemContainerId === containerId) {
 		if (draggedItemOrder < itemOrder) {
-			return -draggedItemHeight;
+			return -draggedItemSize;
 		}
 	}
 
@@ -28,10 +28,10 @@ const getSpaceForCurrentlyDraggedItem = ({
 			return 0;
 		}
 		if (slotNumber >= itemOrder && draggedItemOrder < itemOrder) {
-			return -draggedItemHeight;
+			return -draggedItemSize;
 		}
 		if (slotNumber <= itemOrder && draggedItemOrder > itemOrder) {
-			return draggedItemHeight;
+			return draggedItemSize;
 		}
 	}
 
@@ -41,7 +41,7 @@ const getSpaceForCurrentlyDraggedItem = ({
 		isMouseOver
 	) {
 		if (slotNumber <= itemOrder) {
-			return draggedItemHeight;
+			return draggedItemSize;
 		}
 	}
 
