@@ -37,9 +37,17 @@ function App() {
 										id={item.id}
 										color={item.color}
 									>
-										<p style={{ margin: 0 }}>
-											{item.color}
-										</p>
+										<div>
+											<p
+												style={{
+													margin: 0,
+													width: 100,
+													height: 70,
+												}}
+											>
+												{item.color}
+											</p>
+										</div>
 									</DragAndDropItem>
 								))
 							}
@@ -52,9 +60,17 @@ function App() {
 										id={item.id}
 										color={item.color}
 									>
-										<p style={{ margin: 0 }}>
-											{item.color}
-										</p>
+										<div>
+											<p
+												style={{
+													margin: 0,
+													width: 100,
+													height: 70,
+												}}
+											>
+												{item.color}
+											</p>
+										</div>
 									</DragAndDropItem>
 								))
 							}
@@ -67,9 +83,17 @@ function App() {
 										id={item.id}
 										color={item.color}
 									>
-										<p style={{ margin: 0 }}>
-											{item.color}
-										</p>
+										<div>
+											<p
+												style={{
+													margin: 0,
+													width: 100,
+													height: 70,
+												}}
+											>
+												{item.color}
+											</p>
+										</div>
 									</DragAndDropItem>
 								))
 							}

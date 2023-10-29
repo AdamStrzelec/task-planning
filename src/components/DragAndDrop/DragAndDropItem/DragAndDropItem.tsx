@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 import { useContextSelector } from 'use-context-selector';
@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 import { DragAndDropContainerContext } from '../DragAndDropContainer/DragAndDropContainer';
 import { DragAndDropHelpers } from '../helpers/DragAndDrop.helpers';
 
-export interface onDragItemProps {
+export interface OnDragItemProps {
 	id: string;
 	posX: number;
 	posY: number;
@@ -18,10 +18,16 @@ export interface onDragItemProps {
 	height: number;
 }
 
-export interface onDropItemProps {
+export interface OnDropItemProps {
 	id: string;
 	containerId?: string;
 	order?: number;
+}
+
+export interface OnItemDimensionsChange {
+	id: string;
+	width: number;
+	height: number;
 }
 
 interface DragAndDropItemProps {
@@ -35,12 +41,23 @@ export const DragAndDropItemComponent = ({
 	color,
 	children,
 }: DragAndDropItemProps) => {
-	const { width, height } = useContextSelector(
+	const itemRef = useRef<HTMLDivElement>(null);
+
+	const onItemDimensionsChange = useContextSelector(
 		DragAndDropContext,
-		(state) => state.items[id],
+		(state) => state.onItemDimensionsChange,
 	);
 
-	//TODO zaimplementować funkcję która będzie zmieniało width i height z poziomu itemu na podstawie children
+	useEffect(() => {
+		onItemDimensionsChange({
+			id,
+			width: itemRef.current?.getBoundingClientRect().width || 0,
+			height: itemRef.current?.getBoundingClientRect().height || 0,
+		});
+	}, [
+		itemRef.current?.getBoundingClientRect().width,
+		itemRef.current?.getBoundingClientRect().height,
+	]);
 
 	const onDragItem = useContextSelector(
 		DragAndDropContext,
@@ -96,15 +113,11 @@ export const DragAndDropItemComponent = ({
 
 	const isDragged = draggedItemId === id;
 
-	const itemRef = useRef<HTMLDivElement>(null);
-
 	const {
 		isMouseOver,
 		containerId: contId,
 		slotNumber,
 	} = useContextSelector(DragAndDropContainerContext, (state) => state);
-
-	console.log(isMouseOver + ' ' + contId);
 
 	const { getSpaceForCurrentlyDraggedItem } = DragAndDropHelpers;
 
@@ -154,8 +167,6 @@ export const DragAndDropItemComponent = ({
 							0,
 					});
 				}}
-				width={width}
-				height={height}
 				onMouseUp={() => {
 					onDropItem({
 						id,
@@ -163,9 +174,6 @@ export const DragAndDropItemComponent = ({
 				}}
 			>
 				{children}
-				{/* <p style={{ margin: 0, padding: 5 }}>id: {itemId}</p>
-				<p style={{ margin: 0, padding: 5 }}>col: {containerId}</p>
-				<p style={{ margin: 0, padding: 5 }}>order: {order}</p> */}
 			</DraggebleDiv>
 		</DraggableWrapper>
 	);
@@ -175,12 +183,8 @@ export const DragAndDropItem = React.memo(DragAndDropItemComponent);
 
 const DraggebleDiv = styled.div<{
 	isDragged?: boolean;
-	width: number;
-	height: number;
 }>(
-	({ isDragged, width, height }) => css`
-		width: ${width}px;
-		height: ${height}px;
+	({ isDragged }) => css`
 		position: relative;
 		z-index: ${isDragged ? 10 : 1};
 	`,

@@ -12,7 +12,6 @@ interface DragAndDropContainerProps {
 			id: string;
 			containerId: string;
 			order: number;
-			isDragged: boolean;
 			color: string;
 			width: number;
 			height: number;

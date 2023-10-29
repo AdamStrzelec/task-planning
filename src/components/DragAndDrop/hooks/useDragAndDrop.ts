@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import {
-	onDragItemProps,
-	onDropItemProps,
+	OnDragItemProps,
+	OnDropItemProps,
 } from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
 import { DragAndDropHelpers } from 'src/components/DragAndDrop/helpers/DragAndDrop.helpers';
 import { mockedItems } from 'src/components/DragAndDrop/mocks/mockedItems';
@@ -12,7 +12,6 @@ export type Items = Record<
 		id: string;
 		containerId: string;
 		order: number;
-		isDragged: boolean;
 		color: string;
 		width: number;
 		height: number;
@@ -102,7 +101,7 @@ export const useDragAndDrop = () => {
 			clickPositionY,
 			width,
 			height,
-		}: onDragItemProps) => {
+		}: OnDragItemProps) => {
 			setDraggedItemPositionDifference({ posX, posY });
 			setDroppedItemMetadata({ droppedItemInfo: {} });
 
@@ -141,7 +140,7 @@ export const useDragAndDrop = () => {
 	);
 
 	const onDropItem = useCallback(
-		({ id, containerId, order }: onDropItemProps) => {
+		({ id, containerId, order }: OnDropItemProps) => {
 			if (containerId && order) {
 				const draggedItemOrder =
 					draggedItemMetadata.draggedItemInfo.order;
@@ -194,11 +193,32 @@ export const useDragAndDrop = () => {
 		[draggedItemMetadata.draggedItemInfo],
 	);
 
+	const onItemDimensionsChange = useCallback(
+		({
+			id,
+			width,
+			height,
+		}: {
+			id: string;
+			width: number;
+			height: number;
+		}) => {
+			const newItems = { ...items };
+
+			newItems[id].width = width;
+			newItems[id].height = height;
+
+			setItems(newItems);
+		},
+		[],
+	);
+
 	return {
 		items,
 		setItems,
 		onDragItem,
 		onDropItem,
+		onItemDimensionsChange,
 		draggedItemMetadata,
 		droppedItemMetadata,
 		slotsPositionDifference,

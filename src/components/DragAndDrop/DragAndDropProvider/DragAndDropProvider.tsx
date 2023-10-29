@@ -2,8 +2,9 @@ import React from 'react';
 import { useMousemove } from 'src/components/DragAndDrop/hooks/useMousemove';
 import { createContext } from 'use-context-selector';
 import {
-	onDragItemProps,
-	onDropItemProps,
+	OnDragItemProps,
+	OnDropItemProps,
+	OnItemDimensionsChange,
 } from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
 import {
 	DraggedItemPositionDifference,
@@ -56,6 +57,9 @@ export const DragAndDropContext = createContext<DragAndDropContextProps>({
 	onDropItem: () => {
 		/**/
 	},
+	onItemDimensionsChange: () => {
+		/**/
+	},
 });
 
 type DragAndDropProveiderComponentProps = {
@@ -85,8 +89,9 @@ type DragAndDropContextProps = {
 	setDraggedItemPositionDifference: (
 		positionDifference: DraggedItemPositionDifference,
 	) => void;
-	onDragItem: (props: onDragItemProps) => void;
-	onDropItem: (props: onDropItemProps) => void;
+	onDragItem: (props: OnDragItemProps) => void;
+	onDropItem: (props: OnDropItemProps) => void;
+	onItemDimensionsChange: (props: OnItemDimensionsChange) => void;
 };
 
 type DragAndDropProveiderProps = {
@@ -103,6 +108,7 @@ export const DragAndDropProvider: React.FC<DragAndDropProveiderProps> = ({
 		items,
 		onDragItem,
 		onDropItem,
+		onItemDimensionsChange,
 		setItems,
 		slotsPositionDifference,
 		setDraggedItemMetadata,
@@ -126,6 +132,7 @@ export const DragAndDropProvider: React.FC<DragAndDropProveiderProps> = ({
 				setDraggedItemPositionDifference,
 				onDragItem,
 				onDropItem,
+				onItemDimensionsChange,
 			}}
 		>
 			<DragAndDropProviderComponent>
