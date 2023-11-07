@@ -214,6 +214,6 @@ const DraggableWrapper = styled.div<{
 					transform: translateX(${spaceForDraggedItem}px);
 			  `}
 		position: relative;
-		z-index: ${isDragged ? 10 : 1};
+		z-index: ${isDragged ? 101 : 1};
 	`,
 );

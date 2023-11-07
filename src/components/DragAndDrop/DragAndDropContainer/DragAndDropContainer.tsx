@@ -101,7 +101,13 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 						position: 'absolute',
 						top: 0,
 						left: 0,
-						zIndex: draggedItemId ? 100 : 120,
+						zIndex: draggedItemId
+							? draggedItemContainerId === containerId
+								? 100
+								: 99
+							: draggedItemContainerId === containerId
+							? 119
+							: 120,
 						display: 'flex',
 						flexDirection: direction,
 					}}
@@ -127,7 +133,7 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 						position: 'relative',
 						top: `${slotPositionDiffY}px`,
 						left: `${slotPositionDiffX}px`,
-						zIndex: 101,
+						zIndex: 110,
 						// backgroundColor: 'rgba(0, 0, 0, 0.3)',
 						width: '100%',
 						height: '100%',
