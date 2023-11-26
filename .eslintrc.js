@@ -26,6 +26,7 @@ module.exports = {
 		sourceType: 'module',
 	},
 	plugins: ['@typescript-eslint', 'react', 'prettier'],
+	ignorePatterns: ['**/types.d.ts'],
 	rules: {
 		indent: ['off'],
 		'prettier/prettier': [2, { useTabs: true }],
