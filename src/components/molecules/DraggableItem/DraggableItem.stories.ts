@@ -11,6 +11,7 @@ type Story = StoryObj<typeof DraggableItem>;
 
 export const Primary: Story = {
 	args: {
+		id: '1',
 		title: 'title',
 		text: 'text',
 	},

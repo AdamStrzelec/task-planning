@@ -32,13 +32,13 @@ export interface OnItemDimensionsChange {
 
 interface DragAndDropItemProps {
 	id: string;
-	color: string;
+	padding?: number;
 	children?: React.ReactNode;
 }
 
 export const DragAndDropItemComponent = ({
 	id,
-	color,
+	padding,
 	children,
 }: DragAndDropItemProps) => {
 	const itemRef = useRef<HTMLDivElement>(null);
@@ -149,9 +149,9 @@ export const DragAndDropItemComponent = ({
 					transform: `translate3d(${
 						!isDragged && x !== 0 ? 100 : x
 					}px, ${y}px, 0px)`,
-					backgroundColor: `${color}`,
 					userSelect: 'none',
 					position: 'relative',
+					padding: padding,
 				}}
 				isDragged={isDragged}
 				onMouseDown={(obj) => {
@@ -215,5 +215,6 @@ const DraggableWrapper = styled.div<{
 			  `}
 		position: relative;
 		z-index: ${isDragged ? 101 : 1};
+		width: 100%;
 	`,
 );

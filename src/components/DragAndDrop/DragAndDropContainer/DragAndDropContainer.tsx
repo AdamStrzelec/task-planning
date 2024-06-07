@@ -19,6 +19,7 @@ interface DragAndDropContainerProps {
 			height: number;
 		}[],
 	) => React.ReactNode;
+	minHeight: number;
 }
 
 type DragAndDropContainerContextProps = {
@@ -39,6 +40,7 @@ export const DragAndDropContainerContext =
 const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 	containerId,
 	direction = 'column',
+	minHeight,
 	children,
 }) => {
 	const [slotNumber, setSlotNumber] = useState(0);
@@ -83,6 +85,32 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 				.sort((a, b) => a.order - b.order)
 		: [];
 
+	const draggedItemHeight =
+		useContextSelector(
+			DragAndDropContext,
+			(state) => state.draggedItemMetadata.draggedItemInfo.height,
+		) || 0;
+
+	const itemsTotalHeight: number = useMemo(() => {
+		return containersOfItems[containerId]
+			? Object.keys(containersOfItems[containerId])
+					.map(
+						(item) =>
+							containersOfItems[containerId]?.[item]?.height,
+					)
+					.reduce((acc, currentValue) => acc + currentValue, 0)
+			: 0;
+	}, [containersOfItems[containerId]]);
+
+	const extraSpace =
+		draggedItemContainerId !== containerId
+			? slotNumber !== 0
+				? draggedItemHeight
+				: 0
+			: slotNumber === 0
+			? -draggedItemHeight
+			: 0;
+
 	return (
 		<DragAndDropContainerContext.Provider
 			value={{ containerId, isMouseOver, slotNumber, direction }}
@@ -91,9 +119,13 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 				onMouseDown={() => setIsMouseOver(true)}
 				style={{
 					position: 'relative',
-					height: 700,
-					width: 100,
+					height:
+						itemsTotalHeight + extraSpace !== 0
+							? itemsTotalHeight + extraSpace
+							: minHeight,
+					width: 200,
 					backgroundColor: 'gray',
+					transition: 'height 0.2s ease-in-out',
 				}}
 			>
 				<div
@@ -110,6 +142,7 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 							: 120,
 						display: 'flex',
 						flexDirection: direction,
+						width: '100%',
 					}}
 				>
 					{children(sortedItems)}
@@ -131,10 +164,12 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 					}
 					style={{
 						position: 'relative',
-						top: `${slotPositionDiffY}px`,
+						top: `${slotPositionDiffY - window.scrollY}px`,
 						left: `${slotPositionDiffX}px`,
 						zIndex: 110,
+						/*this is added to watch behavior of intesm slots */
 						// backgroundColor: 'rgba(0, 0, 0, 0.3)',
+						// border: '1px solid white',
 						width: '100%',
 						height: '100%',
 						display: 'flex',
@@ -203,6 +238,7 @@ const ItemSlotComponent = ({
 			style={{
 				width,
 				height,
+				/*this is added to watch behavior of intesm slots */
 				// border: '1px solid white',
 			}}
 		/>

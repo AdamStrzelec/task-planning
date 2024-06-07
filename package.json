@@ -17,7 +17,9 @@
     "react-redux": "^8.1.2",
     "react-scripts": "5.0.1",
     "scheduler": "^0.23.0",
+    "storybook-preset-inline-svg": "^1.0.1",
     "styled-components": "^5.3.8",
+    "svg-inline-loader": "^0.8.2",
     "typescript": "^4.4.2",
     "use-context-selector": "^1.4.1",
     "web-vitals": "^2.1.0"
