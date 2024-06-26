@@ -4,18 +4,44 @@ import {
 	OnDropItemProps,
 } from 'src/components/DragAndDrop/DragAndDropItem/DragAndDropItem';
 import { DragAndDropHelpers } from 'src/components/DragAndDrop/helpers/DragAndDrop.helpers';
-import { mockedItems } from 'src/components/DragAndDrop/mocks/mockedItems';
+import { ContainerDirection } from 'src/components/DragAndDrop/DragAndDropContainer/DragAndDropContainer';
 
-export type Items = Record<
-	string,
-	{
-		id: string;
-		containerId: string;
-		order: number;
-		color: string;
-		width: number;
-		height: number;
-	}
+export type Item = {
+	id: string;
+	containerId: string;
+	order: number;
+	width: number;
+	height: number;
+	namespace: string;
+	childrenContainerId: string;
+};
+
+export type Items = Record<string, Item>;
+
+type Namespace = string;
+
+type ContainerId = string;
+
+export type ItemsSlotsInfo = Record<
+	Namespace,
+	Record<
+		ContainerId,
+		{
+			slotsItems: Item[];
+			slotsMetadata: {
+				posX: number;
+				posY: number;
+			};
+			containerId: string;
+			isMouseOver: boolean;
+			currentSlotNumber: number;
+			direction: ContainerDirection;
+			options?: {
+				slotsPositionXWithOffset?: boolean;
+				slotsPositionYWithOffset?: boolean;
+			};
+		}
+	>
 >;
 
 export type DraggedItemsMetadata = {
@@ -29,6 +55,7 @@ export type DraggedItemsMetadata = {
 			posY: number;
 			width: number;
 			height: number;
+			namespace: string;
 		}
 	>;
 	draggedItemInfo: Partial<{
@@ -37,6 +64,7 @@ export type DraggedItemsMetadata = {
 		width: number;
 		height: number;
 		order: number;
+		namespace: string;
 	}>;
 };
 
@@ -54,18 +82,19 @@ export type DroppedItemMetadata = {
 	}>;
 };
 
-export type SlotsPositionDifference = {
+type Position = {
 	posX: number;
 	posY: number;
 };
 
-export type DraggedItemPositionDifference = {
-	posX: number;
-	posY: number;
-};
+export type ProviderPosition = Position;
 
-export const useDragAndDrop = () => {
-	const [items, setItems] = useState<Items>(mockedItems);
+export type SlotsPositionDifference = Position;
+
+export type DraggedItemPositionDifference = Position;
+
+export const useDragAndDrop = (dragAndDropItems: Items) => {
+	const [items, setItems] = useState<Items>(dragAndDropItems);
 	const [draggedItemMetadata, setDraggedItemMetadata] =
 		useState<DraggedItemsMetadata>({
 			draggedItem: {},
@@ -87,6 +116,71 @@ export const useDragAndDrop = () => {
 
 	const [draggedItemPositionDifference, setDraggedItemPositionDifference] =
 		useState<DraggedItemPositionDifference>({ posX: 0, posY: 0 });
+
+	const [parentItemOfDraggedItemId, setParentItemOfDraggedItemId] = useState<
+		string | undefined
+	>(undefined);
+
+	const [itemsSlotsState, setItemsSlotsState] = useState<ItemsSlotsInfo>({});
+
+	const setItemsSlots = useCallback((slots: ItemsSlotsInfo) => {
+		const key = Object.keys(slots)[0];
+
+		setItemsSlotsState((prevState) => {
+			const namespaceSlots = {
+				[key]: { ...prevState[key], ...slots[key] },
+			};
+			return {
+				...prevState,
+				...namespaceSlots,
+			};
+		});
+	}, []);
+
+	const setCurrentSlotNumber = useCallback(
+		(namespace: string, containerId: string, slotNumber: number) => {
+			setItemsSlotsState((prevState) => {
+				const prevStateNamespace = prevState[namespace] || {};
+				const container = prevStateNamespace[containerId] || {};
+				return {
+					...prevState,
+					[namespace]: {
+						...prevStateNamespace,
+						[containerId]: {
+							...container,
+							currentSlotNumber: slotNumber,
+						},
+					},
+				};
+			});
+		},
+		[],
+	);
+
+	const setIsMouseOver = useCallback(
+		(namespace: string, containerId: string, isMouseOver: boolean) => {
+			setItemsSlotsState((prevState) => {
+				const prevStateNamespace = prevState[namespace] || {};
+				const container = prevStateNamespace[containerId] || {};
+				return {
+					...prevState,
+					[namespace]: {
+						...prevStateNamespace,
+						[containerId]: {
+							...container,
+							isMouseOver: isMouseOver,
+						},
+					},
+				};
+			});
+		},
+		[],
+	);
+
+	const [providerPosition, setProviderPosition] = useState<ProviderPosition>({
+		posX: 0,
+		posY: 0,
+	});
 
 	const { changeItemsPositionInfoAfterDropItem } = DragAndDropHelpers;
 
@@ -122,6 +216,7 @@ export const useDragAndDrop = () => {
 							height: items[id].height,
 							width: items[id].width,
 							order: items[id].order,
+							namespace: items[id].namespace,
 							posX: 0,
 							posY: 0,
 						},
@@ -132,6 +227,7 @@ export const useDragAndDrop = () => {
 						width: items[id].width,
 						height: items[id].height,
 						order: items[id].order,
+						namespace: items[id].namespace,
 					},
 				});
 			}
@@ -214,6 +310,8 @@ export const useDragAndDrop = () => {
 	);
 
 	return {
+		providerPosition,
+		setProviderPosition,
 		items,
 		setItems,
 		onDragItem,
@@ -227,5 +325,11 @@ export const useDragAndDrop = () => {
 		setDroppedItemMetadata,
 		setSlotsPositionDifference,
 		setDraggedItemPositionDifference,
+		parentItemOfDraggedItemId,
+		setParentItemOfDraggedItemId,
+		setItemsSlots,
+		itemsSlots: itemsSlotsState,
+		setCurrentSlotNumber,
+		setIsMouseOver,
 	};
 };

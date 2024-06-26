@@ -57,6 +57,7 @@ export const useMousemove = () => {
 						height: items[draggedItemId].height,
 						width: items[draggedItemId].width,
 						order: items[draggedItemId].order,
+						namespace: items[draggedItemId].namespace,
 						posX:
 							cursorPosition.x -
 							draggedItemPositionDifference.posX,

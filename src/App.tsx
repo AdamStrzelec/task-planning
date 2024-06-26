@@ -6,6 +6,7 @@ import { DragAndDropContainer } from './components/DragAndDrop/DragAndDropContai
 import { DragAndDropItem } from './components/DragAndDrop/DragAndDropItem/DragAndDropItem';
 import { Theme } from './theme/theme';
 import { DraggableItem } from './components/molecules/DraggableItem/DraggableItem';
+import { mockedItems } from './components/DragAndDrop/mocks/mockedItems';
 
 function App() {
 	return (
@@ -22,76 +23,58 @@ function App() {
 					style={{
 						paddingLeft: 200,
 						paddingTop: 100,
+						backgroundColor: 'orange',
 					}}
 				>
-					<DragAndDropProvider>
-						<div
-							style={{
-								display: 'flex',
-								flexDirection: 'row',
-								gap: '50px',
+					<DragAndDropProvider dragAndDropItems={mockedItems}>
+						<DragAndDropContainer
+							containerId="4"
+							namespace="row"
+							direction={'row'}
+							options={{
+								slotsPositionYWithOffset: false,
+								slotsPositionXWithOffset: true,
 							}}
 						>
-							<DragAndDropContainer
-								containerId={'1'}
-								minHeight={50}
-							>
-								{(items) =>
-									items.map((item) => (
-										<DragAndDropItem
-											key={item.id}
-											id={item.id}
+							{(rowItems) =>
+								rowItems.map((item) => (
+									<DragAndDropItem key={item.id} id={item.id}>
+										<div
+											style={{
+												// width: 200,
+												// height: 200,
+												backgroundColor: 'green',
+												paddingTop: 100,
+											}}
 										>
-											<DraggableItem
-												id={item.id}
-												title={'asddsadsa qwewqewqewq'}
-												text={'cxzxcz'}
-											/>
-										</DragAndDropItem>
-									))
-								}
-							</DragAndDropContainer>
-							<DragAndDropContainer
-								containerId={'2'}
-								minHeight={50}
-							>
-								{(items) =>
-									items.map((item) => (
-										<DragAndDropItem
-											key={item.id}
-											id={item.id}
-										>
-											<DraggableItem
-												id={item.id}
-												title={'asddsadsa'}
-												text={
-													'cxzxcz dsasad asdsadas qwewq'
+											<DragAndDropContainer
+												containerId={
+													item.childrenContainerId
 												}
-											/>
-										</DragAndDropItem>
-									))
-								}
-							</DragAndDropContainer>
-							<DragAndDropContainer
-								containerId={'3'}
-								minHeight={50}
-							>
-								{(items) =>
-									items.map((item) => (
-										<DragAndDropItem
-											key={item.id}
-											id={item.id}
-										>
-											<DraggableItem
-												id={item.id}
-												title={'asddsadsa'}
-												text={'cxzxcz dsasad'}
-											/>
-										</DragAndDropItem>
-									))
-								}
-							</DragAndDropContainer>
-						</div>
+												namespace={'column'}
+											>
+												{(items) =>
+													items.map((item) => (
+														<DragAndDropItem
+															key={item.id}
+															id={item.id}
+														>
+															<DraggableItem
+																id={item.id}
+																title={
+																	'asddsadsa qwewqewqewq'
+																}
+																text={'cxzxcz'}
+															/>
+														</DragAndDropItem>
+													))
+												}
+											</DragAndDropContainer>
+										</div>
+									</DragAndDropItem>
+								))
+							}
+						</DragAndDropContainer>
 					</DragAndDropProvider>
 				</div>
 			</Theme>

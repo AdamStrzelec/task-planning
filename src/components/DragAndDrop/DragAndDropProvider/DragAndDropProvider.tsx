@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useMousemove } from 'src/components/DragAndDrop/hooks/useMousemove';
-import { createContext } from 'use-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import {
 	OnDragItemProps,
 	OnDropItemProps,
@@ -10,12 +10,20 @@ import {
 	DraggedItemPositionDifference,
 	DraggedItemsMetadata,
 	DroppedItemMetadata,
+	ItemsSlotsInfo,
 	Items,
 	SlotsPositionDifference,
 	useDragAndDrop,
+	ProviderPosition,
 } from 'src/components/DragAndDrop/hooks/useDragAndDrop';
+import styled from 'styled-components';
+import { ItemsSlots } from '../ItemsSlots/ItemsSlots';
 
 export const DragAndDropContext = createContext<DragAndDropContextProps>({
+	providerPosition: { posX: 0, posY: 0 },
+	setProviderPosition: () => {
+		/**/
+	},
 	items: {},
 	setItems: () => {
 		/**/
@@ -60,6 +68,20 @@ export const DragAndDropContext = createContext<DragAndDropContextProps>({
 	onItemDimensionsChange: () => {
 		/**/
 	},
+	parentItemOfDraggedItemId: undefined,
+	setParentItemOfDraggedItemId: () => {
+		/**/
+	},
+	itemsSlots: {},
+	setItemsSlots: () => {
+		/**/
+	},
+	setCurrentSlotNumber: () => {
+		/**/
+	},
+	setIsMouseOver: () => {
+		/**/
+	},
 });
 
 type DragAndDropProveiderComponentProps = {
@@ -75,6 +97,8 @@ export const DragAndDropProviderComponent: React.FC<
 };
 
 type DragAndDropContextProps = {
+	providerPosition: ProviderPosition;
+	setProviderPosition: (position: ProviderPosition) => void;
 	items: Items;
 	setItems: (items: Items) => void;
 	draggedItemMetadata: DraggedItemsMetadata;
@@ -92,16 +116,34 @@ type DragAndDropContextProps = {
 	onDragItem: (props: OnDragItemProps) => void;
 	onDropItem: (props: OnDropItemProps) => void;
 	onItemDimensionsChange: (props: OnItemDimensionsChange) => void;
+	parentItemOfDraggedItemId?: string;
+	setParentItemOfDraggedItemId: (parentItemId: string | undefined) => void;
+	itemsSlots: ItemsSlotsInfo;
+	setItemsSlots: (itemsSlots: ItemsSlotsInfo) => void;
+	setCurrentSlotNumber: (
+		namespace: string,
+		containerId: string,
+		currentSlotNumber: number,
+	) => void;
+	setIsMouseOver: (
+		namespace: string,
+		containerId: string,
+		isMouseOver: boolean,
+	) => void;
 };
 
 type DragAndDropProveiderProps = {
 	children: React.ReactNode;
+	dragAndDropItems: Items;
 };
 
-export const DragAndDropProvider: React.FC<DragAndDropProveiderProps> = ({
+export const DragAndDropProvider = ({
 	children,
-}) => {
+	dragAndDropItems,
+}: DragAndDropProveiderProps) => {
 	const {
+		providerPosition,
+		setProviderPosition,
 		draggedItemMetadata,
 		draggedItemPositionDifference,
 		droppedItemMetadata,
@@ -115,11 +157,19 @@ export const DragAndDropProvider: React.FC<DragAndDropProveiderProps> = ({
 		setDraggedItemPositionDifference,
 		setDroppedItemMetadata,
 		setSlotsPositionDifference,
-	} = useDragAndDrop();
+		parentItemOfDraggedItemId,
+		setParentItemOfDraggedItemId,
+		itemsSlots,
+		setItemsSlots,
+		setCurrentSlotNumber,
+		setIsMouseOver,
+	} = useDragAndDrop(dragAndDropItems);
 
 	return (
 		<DragAndDropContext.Provider
 			value={{
+				providerPosition,
+				setProviderPosition,
 				items,
 				setItems,
 				draggedItemMetadata,
@@ -133,11 +183,55 @@ export const DragAndDropProvider: React.FC<DragAndDropProveiderProps> = ({
 				onDragItem,
 				onDropItem,
 				onItemDimensionsChange,
+				parentItemOfDraggedItemId,
+				setParentItemOfDraggedItemId,
+				itemsSlots,
+				setItemsSlots,
+				setCurrentSlotNumber,
+				setIsMouseOver,
 			}}
 		>
-			<DragAndDropProviderComponent>
-				{children}
-			</DragAndDropProviderComponent>
+			<ContainerWrapper>
+				<DragAndDropProviderComponent>
+					{children}
+				</DragAndDropProviderComponent>
+				<ItemsSlots />
+			</ContainerWrapper>
 		</DragAndDropContext.Provider>
 	);
 };
+
+interface ContainerWrapperProps {
+	children?: React.ReactNode;
+}
+
+const ContainerWrapper = ({ children }: ContainerWrapperProps) => {
+	const providerContainerRef = useRef<HTMLDivElement>(null);
+
+	const setProviderPosition = useContextSelector(
+		DragAndDropContext,
+		(state) => state.setProviderPosition,
+	);
+
+	useEffect(() => {
+		setProviderPosition({
+			posX:
+				providerContainerRef.current?.getBoundingClientRect().left ?? 0,
+			posY:
+				providerContainerRef.current?.getBoundingClientRect().top ?? 0,
+		});
+	}, [
+		providerContainerRef.current?.getBoundingClientRect().top,
+		providerContainerRef.current?.getBoundingClientRect().left,
+	]);
+
+	return (
+		<ProviderContainer ref={providerContainerRef}>
+			{children}
+		</ProviderContainer>
+	);
+};
+
+const ProviderContainer = styled.div`
+	position: relative;
+`;

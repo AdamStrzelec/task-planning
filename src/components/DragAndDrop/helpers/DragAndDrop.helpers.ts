@@ -8,6 +8,8 @@ const getSpaceForCurrentlyDraggedItem = ({
 	draggedItemContainerId,
 	containerId,
 	isMouseOver,
+	namespace,
+	draggedItemNamespace,
 }: {
 	itemOrder: number;
 	draggedItemOrder?: number;
@@ -16,7 +18,10 @@ const getSpaceForCurrentlyDraggedItem = ({
 	draggedItemContainerId?: string;
 	containerId: string;
 	isMouseOver: boolean;
+	namespace: string;
+	draggedItemNamespace?: string;
 }) => {
+	if (draggedItemNamespace !== namespace) return 0;
 	if (!isMouseOver && draggedItemContainerId === containerId) {
 		if (draggedItemOrder < itemOrder) {
 			return -draggedItemSize;
