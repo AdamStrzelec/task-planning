@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 import { useContextSelector } from 'use-context-selector';
-import { isEmpty } from 'lodash';
-import { DragAndDropContainerContext } from '../DragAndDropContainer/DragAndDropContainer';
 import { createContext } from 'use-context-selector';
 import { DragAndDropHelpers } from '../helpers/DragAndDrop.helpers';
+import { useDragAndDropItem } from './useDragAndDropItem';
 
 export interface OnDragItemProps {
 	id: string;
@@ -51,6 +50,30 @@ export const DragAndDropItemComponent = ({
 	padding,
 	children,
 }: DragAndDropItemProps) => {
+	const {
+		containerId,
+		direction,
+		draggedItemContainerId,
+		draggedItemHeight,
+		draggedItemNamespace,
+		draggedItemOrder,
+		draggedItemWidth,
+		isDragged,
+		isMouseOver,
+		onDragItem,
+		onDropItem,
+		order,
+		parentItemId,
+		parentItemOfDraggedItemId,
+		setParentItemOfDraggedItemId,
+		shouldItemAnimate,
+		shouldWrapperAnimate,
+		slotNumber,
+		draggedPosX,
+		draggedPosY,
+		namespace,
+	} = useDragAndDropItem({ id });
+
 	const itemRef = useRef<HTMLDivElement>(null);
 
 	const onItemDimensionsChange = useContextSelector(
@@ -69,107 +92,7 @@ export const DragAndDropItemComponent = ({
 		itemRef.current?.getBoundingClientRect().height,
 	]);
 
-	const onDragItem = useContextSelector(
-		DragAndDropContext,
-		(state) => state.onDragItem,
-	);
-
-	const onDropItem = useContextSelector(
-		DragAndDropContext,
-		(state) => state.onDropItem,
-	);
-
-	const x =
-		useContextSelector(
-			DragAndDropContext,
-			(state) => state.draggedItemMetadata.draggedItem[id]?.posX,
-		) || 0;
-	const y =
-		useContextSelector(
-			DragAndDropContext,
-			(state) => state.draggedItemMetadata.draggedItem[id]?.posY,
-		) || 0;
-
-	const namespace = useContextSelector(
-		DragAndDropContext,
-		(state) => state.items[id].namespace,
-	);
-
-	const { namespace: draggedItemNamespace } = useContextSelector(
-		DragAndDropContext,
-		(state) => state.draggedItemMetadata.draggedItemInfo,
-	);
-
-	const { containerId, order } = useContextSelector(
-		DragAndDropContext,
-		(state) => state.items[id],
-	);
-
-	const {
-		id: draggedItemId,
-		order: draggedItemOrder,
-		containerId: draggedItemContainerId,
-		height: draggedItemHeight,
-		width: draggedItemWidth,
-	} = useContextSelector(
-		DragAndDropContext,
-		(state) => state.draggedItemMetadata.draggedItemInfo,
-	);
-
-	const { droppedItemInfo } = useContextSelector(
-		DragAndDropContext,
-		(state) => state.droppedItemMetadata,
-	);
-	const shouldWrapperAnimate = () =>
-		(!!draggedItemId && draggedItemId !== id) ||
-		(!!droppedItemInfo.startPosition &&
-			droppedItemInfo.startPosition.containerId === containerId &&
-			!droppedItemInfo.targetPosition);
-
-	const shouldItemAnimate = () => {
-		return (
-			!!droppedItemInfo &&
-			droppedItemInfo.id === id &&
-			isEmpty(droppedItemInfo.targetPosition)
-		);
-	};
-
-	const isDragged = draggedItemId === id;
-
-	const { containerId: contId, direction } = useContextSelector(
-		DragAndDropContainerContext,
-		(state) => state,
-	);
-
-	const slotNumber =
-		useContextSelector(
-			DragAndDropContext,
-			(state) =>
-				state.itemsSlots?.[namespace]?.[containerId].currentSlotNumber,
-		) ?? 0;
-
-	const isMouseOver =
-		useContextSelector(
-			DragAndDropContext,
-			(state) => state.itemsSlots?.[namespace]?.[containerId].isMouseOver,
-		) ?? false;
-
 	const { getSpaceForCurrentlyDraggedItem } = DragAndDropHelpers;
-
-	const parentItemId = useContextSelector(
-		DragAndDropItemContext,
-		(state) => state.parentItemId,
-	);
-
-	const parentItemOfDraggedItemId = useContextSelector(
-		DragAndDropContext,
-		(state) => state.parentItemOfDraggedItemId,
-	);
-
-	const setParentItemOfDraggedItemId = useContextSelector(
-		DragAndDropContext,
-		(state) => state.setParentItemOfDraggedItemId,
-	);
 
 	return (
 		<DragAndDropItemContext.Provider
@@ -187,7 +110,7 @@ export const DragAndDropItemComponent = ({
 							: draggedItemWidth,
 					draggedItemOrder,
 					draggedItemContainerId,
-					containerId: contId || '',
+					containerId: containerId || '',
 					isMouseOver,
 					namespace,
 					draggedItemNamespace,
@@ -203,8 +126,8 @@ export const DragAndDropItemComponent = ({
 							transition: 'transform 0.2s ease-in-out',
 						}),
 						transform: `translate3d(${
-							!isDragged && x !== 0 ? 100 : x
-						}px, ${y}px, 0px)`,
+							!isDragged && draggedPosX !== 0 ? 100 : draggedPosX
+						}px, ${draggedPosY}px, 0px)`,
 						userSelect: 'none',
 						padding: 20,
 					}}
@@ -213,8 +136,8 @@ export const DragAndDropItemComponent = ({
 						setParentItemOfDraggedItemId(parentItemId);
 						onDragItem({
 							id,
-							posX: Math.abs(event.pageX - x),
-							posY: Math.abs(event.pageY - y),
+							posX: Math.abs(event.pageX - draggedPosX),
+							posY: Math.abs(event.pageY - draggedPosY),
 							clickPositionX: event.pageX,
 							clickPositionY: event.pageY,
 							windowPositionX:

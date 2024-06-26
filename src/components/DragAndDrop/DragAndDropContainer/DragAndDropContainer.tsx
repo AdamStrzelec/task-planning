@@ -1,12 +1,11 @@
-import { isEmpty } from 'lodash';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useContextSelector } from 'use-context-selector';
 import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 import { createContext } from 'use-context-selector';
-import { DragAndDropHelpers } from '../helpers/DragAndDrop.helpers';
+import { useDragAndDropContainer } from './useDragAndDropContainer';
 
 export type ContainerDirection = 'row' | 'column';
-interface DragAndDropContainerProps {
+export interface DragAndDropContainerProps {
 	containerId: string;
 	direction?: ContainerDirection;
 	children: (
@@ -49,12 +48,8 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 		slotsPositionYWithOffset: true,
 	},
 }) => {
-	const [isMouseOver, setIsMouseOver] = useState(false);
-
-	const draggedItemNamespace = useContextSelector(
-		DragAndDropContext,
-		(state) => state.draggedItemMetadata.draggedItemInfo.namespace,
-	);
+	const { draggedItemNamespace, isMouseOver, setIsMouseOver, sortedItems } =
+		useDragAndDropContainer({ containerId });
 
 	const setItemsSlots = useContextSelector(
 		DragAndDropContext,
@@ -95,24 +90,6 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 		containerRef.current?.getBoundingClientRect().left,
 	]);
 
-	const { getContainersOfItems } = DragAndDropHelpers;
-
-	const items = useContextSelector(
-		DragAndDropContext,
-		(state) => state.items,
-	);
-
-	const containersOfItems = useMemo(
-		() => getContainersOfItems(items),
-		[items],
-	);
-
-	const sortedItems = !isEmpty(containersOfItems[containerId])
-		? Object.keys(containersOfItems[containerId])
-				.map((key) => items[key])
-				.sort((a, b) => a.order - b.order)
-		: [];
-
 	return (
 		<DragAndDropContainerContext.Provider
 			value={{
@@ -146,54 +123,6 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 				</div>
 			</div>
 		</DragAndDropContainerContext.Provider>
-	);
-};
-
-type ItemSlotProps = {
-	width: number;
-	height: number;
-	slotNumber: number;
-	setSlotNumber: (slot: number) => void;
-	containerId: string;
-	namespace: string;
-	draggedItemNamespace?: string;
-	onDropItem: ({
-		id,
-		containerId,
-		order,
-		posX,
-		posY,
-	}: {
-		id: string;
-		containerId?: string;
-		order?: number;
-		posX?: number;
-		posY?: number;
-	}) => void;
-};
-
-const ItemSlotComponent = ({
-	width,
-	height,
-	slotNumber,
-	setSlotNumber,
-	namespace,
-	draggedItemNamespace,
-}: ItemSlotProps) => {
-	return (
-		<div
-			onMouseOver={() => {
-				if (namespace === draggedItemNamespace) {
-					setSlotNumber(slotNumber);
-				}
-			}}
-			style={{
-				width,
-				height,
-				/*this is added to watch behavior of intesm slots */
-				border: '1px solid white',
-			}}
-		/>
 	);
 };
 
