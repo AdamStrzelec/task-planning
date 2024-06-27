@@ -1,34 +1,73 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { OptionsIcon } from 'src/assets/Icons/Icons';
+import { IconManager } from 'src/components/atoms/IconManager/IconManager';
+
+const itemTitleColors = {
+	red: '#e45300',
+	green: '#50c878',
+	blue: '#0091e4',
+	yellow: '#ffd700',
+	purple: '#9d61ac',
+};
+
+type TitleBackgroundColor = keyof typeof itemTitleColors;
 
 interface DraggableItemProps {
 	id: string;
 	title: string;
 	text: string;
+	titleColor?: TitleBackgroundColor;
+	onDeleteItem?: (id: string) => void;
+	onEdit?: (id: string) => void;
 }
 
-export const DraggableItem = ({ title, text }: DraggableItemProps) => {
+export const DraggableItem = ({
+	id,
+	title,
+	text,
+	titleColor = 'blue',
+	onDeleteItem,
+	onEdit,
+}: DraggableItemProps) => {
+	const [isExpanded, setIsExpanded] = useState(false);
 	return (
-		// <div
-		// 	style={{
-		// 		padding: 30,
-		// 		backgroundColor: 'red',
-		// 		border: '1px solid blue',
-		// 	}}
-		// >
 		<DraggebleItemWrapper>
 			<HeaderWrapper>
-				<ItemTitle>{title}</ItemTitle>
-				<OptionsButton>
-					<StyledOptionsIcon />
+				<ItemTitle titleColor={titleColor}>{title}</ItemTitle>
+				<OptionsButton
+					onClick={() => {
+						setIsExpanded(!isExpanded);
+					}}
+				>
+					<IconManager
+						name={'Options'}
+						size={13}
+						color={'itemText'}
+					/>
 				</OptionsButton>
 			</HeaderWrapper>
-			<DescriptionWrapper>
+			<DescriptionWrapper isExpanded={isExpanded}>
 				<ItemDescription>{text}</ItemDescription>
 			</DescriptionWrapper>
+			{isExpanded && (
+				<OptionsWrapper>
+					<OptionsButton onClick={() => onEdit?.(id)}>
+						<IconManager
+							name={'Edit'}
+							size={23}
+							color={'blueInfo'}
+						/>
+					</OptionsButton>
+					<OptionsButton onClick={() => onDeleteItem?.(id)}>
+						<IconManager
+							name={'Basket'}
+							size={20}
+							color={'errorRed'}
+						/>
+					</OptionsButton>
+				</OptionsWrapper>
+			)}
 		</DraggebleItemWrapper>
-		// </div>
 	);
 };
 
@@ -42,52 +81,72 @@ const HeaderWrapper = styled.div`
 const DraggebleItemWrapper = styled.div(
 	({ theme: { colors } }) => css`
 		width: 100%;
-		/* height: 100%; */
-		background-color: ${colors.lightBlue};
-		border-radius: 7px;
-		padding: 12px 8px;
+		background-color: ${colors.powderWhite};
+		border-radius: 5px;
+		padding: 15px 10px;
+		/* border: 1px solid black; */
 	`,
 );
 
-const ItemTitle = styled.h3`
-	margin: 0;
-	font-weight: 500;
-	text-overflow: ellipsis;
-	overflow: hidden;
-	white-space: nowrap;
-`;
+const ItemTitle = styled.h3<{ titleColor: TitleBackgroundColor }>(
+	({ titleColor, theme: { colors, fontSize } }) => css`
+		margin: 0;
+		font-weight: 500;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+		background-color: ${itemTitleColors[titleColor]};
+		padding: 4px 10px;
+		border-radius: 7px;
+		color: ${colors.powderWhite};
+		font-size: ${fontSize.s}px;
+	`,
+);
 
 const OptionsButton = styled.button(
-	({ theme: { colors } }) => css`
+	() => css`
 		width: 22px;
 		height: 22px;
-		background-color: ${colors.powderWhite};
 		border: none;
-		border-radius: 15px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
+		background-color: transparent;
 	`,
 );
 
-const StyledOptionsIcon = styled(OptionsIcon)(
-	({ theme: { colors } }) => css`
-		width: 10px;
-		height: 10px;
-		fill: ${colors.onyx};
-	`,
-);
-
-const DescriptionWrapper = styled.div(
-	({ theme: { colors } }) => css`
-		padding: 8px;
+const DescriptionWrapper = styled.div<{ isExpanded: boolean }>(
+	({ theme: { colors }, isExpanded }) => css`
+		padding: 0 8px;
 		background-color: ${colors.powderWhite};
 		margin-top: 6px;
-		border-radius: 5px;
+		overflow: hidden;
+		width: 100%;
+
+		${() =>
+			!isExpanded &&
+			css`
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+			`}
 	`,
 );
 
-const ItemDescription = styled.p`
-	margin: 0;
+const ItemDescription = styled.p(
+	({ theme: { colors, fontSize } }) => css`
+		margin: 0;
+		color: ${colors.itemText};
+		font-size: ${fontSize.s}px;
+	`,
+);
+
+const OptionsWrapper = styled.div`
+	width: 100%;
+	padding: 15px 20px 0px 20px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
 `;

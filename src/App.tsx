@@ -19,13 +19,7 @@ function App() {
 						width: '100vw',
 					}}
 				/>
-				<div
-					style={{
-						paddingLeft: 200,
-						paddingTop: 100,
-						backgroundColor: 'orange',
-					}}
-				>
+				<div>
 					<DragAndDropProvider dragAndDropItems={mockedItems}>
 						<DragAndDropContainer
 							containerId="4"
@@ -41,7 +35,7 @@ function App() {
 									<DragAndDropItem key={item.id} id={item.id}>
 										<div
 											style={{
-												// width: 200,
+												width: 350,
 												// height: 200,
 												backgroundColor: 'green',
 												paddingTop: 100,
@@ -64,7 +58,23 @@ function App() {
 																title={
 																	'asddsadsa qwewqewqewq'
 																}
-																text={'cxzxcz'}
+																text={
+																	'cxzxcz asdsasadsa qwewqeqwewq asdssad xzcxzcxxcz assasad qwewqeqwew asasddsa xzcxzcxz sadsaasd'
+																}
+																onDeleteItem={(
+																	id,
+																) =>
+																	console.log(
+																		'delete ID: ',
+																		id,
+																	)
+																}
+																onEdit={(id) =>
+																	console.log(
+																		'edit ID: ',
+																		id,
+																	)
+																}
 															/>
 														</DragAndDropItem>
 													))

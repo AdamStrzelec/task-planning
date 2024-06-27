@@ -9,6 +9,11 @@ export const ItemsSlots = () => {
 		(state) => state.itemsSlots,
 	);
 
+	const canDisplaySlots = useContextSelector(
+		DragAndDropContext,
+		(state) => state.canDisplaySlots,
+	);
+
 	const draggedItemNamespace = useContextSelector(
 		DragAndDropContext,
 		(state) => state.draggedItemMetadata.draggedItemInfo.namespace,
@@ -64,6 +69,7 @@ export const ItemsSlots = () => {
 		<div>
 			<>
 				{draggedItemNamespace &&
+					canDisplaySlots &&
 					Object.keys(itemsSlots[draggedItemNamespace]).map(
 						(item, index) => {
 							const containerSlots =

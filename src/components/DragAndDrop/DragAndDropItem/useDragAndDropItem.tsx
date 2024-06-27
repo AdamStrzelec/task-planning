@@ -26,6 +26,36 @@ export const useDragAndDropItem = ({ id }: Pick<OnDragItemProps, 'id'>) => {
 			(state) => state.draggedItemMetadata.draggedItem[id]?.posY,
 		) || 0;
 
+	const canDisplaySlots = useContextSelector(
+		DragAndDropContext,
+		(state) => state.canDisplaySlots,
+	);
+
+	const setCanDisplaySlots = useContextSelector(
+		DragAndDropContext,
+		(state) => state.setCanDisplaySlots,
+	);
+
+	const {
+		id: draggedItemId,
+		order: draggedItemOrder,
+		containerId: draggedItemContainerId,
+		height: draggedItemHeight,
+		width: draggedItemWidth,
+	} = useContextSelector(
+		DragAndDropContext,
+		(state) => state.draggedItemMetadata.draggedItemInfo,
+	);
+
+	const isDragged = draggedItemId === id;
+
+	if (
+		(isDragged && !canDisplaySlots && Math.abs(draggedPosX) > 5) ||
+		Math.abs(draggedPosY) > 5
+	) {
+		setCanDisplaySlots(true);
+	}
+
 	const namespace = useContextSelector(
 		DragAndDropContext,
 		(state) => state.items[id].namespace,
@@ -41,21 +71,11 @@ export const useDragAndDropItem = ({ id }: Pick<OnDragItemProps, 'id'>) => {
 		(state) => state.items[id],
 	);
 
-	const {
-		id: draggedItemId,
-		order: draggedItemOrder,
-		containerId: draggedItemContainerId,
-		height: draggedItemHeight,
-		width: draggedItemWidth,
-	} = useContextSelector(
-		DragAndDropContext,
-		(state) => state.draggedItemMetadata.draggedItemInfo,
-	);
-
 	const { droppedItemInfo } = useContextSelector(
 		DragAndDropContext,
 		(state) => state.droppedItemMetadata,
 	);
+
 	const shouldWrapperAnimate = () =>
 		(!!draggedItemId && draggedItemId !== id) ||
 		(!!droppedItemInfo.startPosition &&
@@ -69,8 +89,6 @@ export const useDragAndDropItem = ({ id }: Pick<OnDragItemProps, 'id'>) => {
 			isEmpty(droppedItemInfo.targetPosition)
 		);
 	};
-
-	const isDragged = draggedItemId === id;
 
 	const { containerId: contId, direction } = useContextSelector(
 		DragAndDropContainerContext,
@@ -127,5 +145,6 @@ export const useDragAndDropItem = ({ id }: Pick<OnDragItemProps, 'id'>) => {
 		parentItemOfDraggedItemId,
 		setParentItemOfDraggedItemId,
 		namespace,
+		canDisplaySlots,
 	};
 };

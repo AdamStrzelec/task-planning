@@ -12,7 +12,7 @@ type Story = StoryObj<typeof DraggableItem>;
 export const Primary: Story = {
 	args: {
 		id: '1',
-		title: 'title',
-		text: 'text',
+		title: 'In progress asddasadssda qwwqeqw asdsad',
+		text: 'text asd adsdwqewqeqw assadsasda qwwqeqw asdsad qwwqee asddsa sadsadsa qwwqeqew xzcxz asadas qweqwqwe asddsa xzcz qwewqewqwe sadassadds xxcx',
 	},
 };

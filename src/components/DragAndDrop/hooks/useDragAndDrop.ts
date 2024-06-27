@@ -120,6 +120,11 @@ export const useDragAndDrop = (dragAndDropItems: Items) => {
 	const [parentItemOfDraggedItemId, setParentItemOfDraggedItemId] = useState<
 		string | undefined
 	>(undefined);
+	const [canDisplaySlotsState, setCanDisplaySlotsState] = useState(false);
+
+	const setCanDisplaySlots = useCallback((canDisplaySlots: boolean) => {
+		setCanDisplaySlotsState(canDisplaySlots);
+	}, []);
 
 	const [itemsSlotsState, setItemsSlotsState] = useState<ItemsSlotsInfo>({});
 
@@ -252,6 +257,7 @@ export const useDragAndDrop = (dragAndDropItems: Items) => {
 			}
 
 			setDraggedItemPositionDifference({ posX: 0, posY: 0 });
+			setCanDisplaySlots(false);
 
 			setDroppedItemMetadata({
 				droppedItemInfo: {
@@ -331,5 +337,7 @@ export const useDragAndDrop = (dragAndDropItems: Items) => {
 		itemsSlots: itemsSlotsState,
 		setCurrentSlotNumber,
 		setIsMouseOver,
+		canDisplaySlots: canDisplaySlotsState,
+		setCanDisplaySlots,
 	};
 };

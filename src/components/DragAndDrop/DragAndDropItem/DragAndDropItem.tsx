@@ -72,6 +72,7 @@ export const DragAndDropItemComponent = ({
 		draggedPosX,
 		draggedPosY,
 		namespace,
+		canDisplaySlots,
 	} = useDragAndDropItem({ id });
 
 	const itemRef = useRef<HTMLDivElement>(null);
@@ -80,13 +81,15 @@ export const DragAndDropItemComponent = ({
 		DragAndDropContext,
 		(state) => state.onItemDimensionsChange,
 	);
-
-	useEffect(() => {
+	const onDimensionsChange = () => {
 		onItemDimensionsChange({
 			id,
 			width: itemRef.current?.getBoundingClientRect().width || 0,
 			height: itemRef.current?.getBoundingClientRect().height || 0,
 		});
+	};
+	useEffect(() => {
+		onDimensionsChange();
 	}, [
 		itemRef.current?.getBoundingClientRect().width,
 		itemRef.current?.getBoundingClientRect().height,
@@ -114,6 +117,7 @@ export const DragAndDropItemComponent = ({
 					isMouseOver,
 					namespace,
 					draggedItemNamespace,
+					canDisplaySlots,
 				})}
 				direction={direction}
 				shouldAnimate={shouldWrapperAnimate()}
@@ -129,11 +133,12 @@ export const DragAndDropItemComponent = ({
 							!isDragged && draggedPosX !== 0 ? 100 : draggedPosX
 						}px, ${draggedPosY}px, 0px)`,
 						userSelect: 'none',
-						padding: 20,
+						padding: 5,
 					}}
 					onMouseDown={(event) => {
 						event.stopPropagation();
 						setParentItemOfDraggedItemId(parentItemId);
+						onDimensionsChange();
 						onDragItem({
 							id,
 							posX: Math.abs(event.pageX - draggedPosX),
