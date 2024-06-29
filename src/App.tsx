@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import { GlobalStyle } from './global/global.styles';
 import { DragAndDropProvider } from './components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
@@ -7,19 +7,27 @@ import { DragAndDropItem } from './components/DragAndDrop/DragAndDropItem/DragAn
 import { Theme } from './theme/theme';
 import { DraggableItem } from './components/molecules/DraggableItem/DraggableItem';
 import { mockedItems } from './components/DragAndDrop/mocks/mockedItems';
+import RoadImage from 'src/assets/images/road-2.jpg';
+import { DraggableColumn } from './components/molecules/DraggableColumn/DraggableColumn';
 
 function App() {
+	const [focusedContainerId, setFocusedContainerId] = useState('');
+	const [draggedItemContainerId, setDraggedItemContainerId] = useState('');
+	const [draggedItemHeight, setDraggedItemHeight] = useState(0);
+
 	return (
 		<>
 			<GlobalStyle />
 			<Theme>
 				<div
 					style={{
-						position: 'relative',
+						backgroundImage: `url(${RoadImage})`,
 						width: '100vw',
+						height: '100vh',
+						backgroundRepeat: 'no-repeat',
+						backgroundSize: 'cover',
 					}}
-				/>
-				<div>
+				>
 					<DragAndDropProvider dragAndDropItems={mockedItems}>
 						<DragAndDropContainer
 							containerId="4"
@@ -31,58 +39,107 @@ function App() {
 							}}
 						>
 							{(rowItems) =>
-								rowItems.map((item) => (
-									<DragAndDropItem key={item.id} id={item.id}>
-										<div
-											style={{
-												width: 350,
-												// height: 200,
-												backgroundColor: 'green',
-												paddingTop: 100,
-											}}
+								rowItems.map((item) => {
+									const childrenContainerId =
+										item.childrenContainerId;
+
+									return (
+										<DragAndDropItem
+											key={item.id}
+											id={item.id}
 										>
-											<DragAndDropContainer
-												containerId={
-													item.childrenContainerId
+											<DraggableColumn
+												title={'In progress'}
+												id={childrenContainerId}
+												draggedItemContainerId={
+													draggedItemContainerId
 												}
-												namespace={'column'}
+												draggedItemHeight={
+													draggedItemHeight
+												}
+												focusedContainerId={
+													focusedContainerId
+												}
 											>
-												{(items) =>
-													items.map((item) => (
-														<DragAndDropItem
-															key={item.id}
-															id={item.id}
-														>
-															<DraggableItem
+												<DragAndDropContainer
+													containerId={
+														item.childrenContainerId
+													}
+													namespace={'column'}
+													onContainerFocused={() => {
+														setFocusedContainerId(
+															childrenContainerId,
+														);
+													}}
+													onContainerUnfocused={() => {
+														setFocusedContainerId(
+															'',
+														);
+													}}
+												>
+													{(items) =>
+														items.map((item) => (
+															<DragAndDropItem
+																key={item.id}
 																id={item.id}
-																title={
-																	'asddsadsa qwewqewqewq'
-																}
-																text={
-																	'cxzxcz asdsasadsa qwewqeqwewq asdssad xzcxzcxxcz assasad qwewqeqwew asasddsa xzcxzcxz sadsaasd'
-																}
-																onDeleteItem={(
-																	id,
-																) =>
-																	console.log(
-																		'delete ID: ',
+																onDragItemStart={({
+																	containerId,
+																	itemHeight,
+																}) => {
+																	setDraggedItemContainerId(
+																		containerId ??
+																			'',
+																	);
+																	setDraggedItemHeight(
+																		itemHeight ??
+																			0,
+																	);
+																}}
+																onDragItemFinish={() => {
+																	setDraggedItemContainerId(
+																		'',
+																	);
+																	setDraggedItemHeight(
+																		0,
+																	);
+																}}
+															>
+																<DraggableItem
+																	id={item.id}
+																	title={
+																		'asddsadsa qwewqewqewq'
+																	}
+																	text={
+																		'cxzxcz asdsasadsa qwewqeqwewq asdssad xzcxzcxxcz assasad qwewqeqwew asasddsa xzcxzcxz sadsaasd'
+																	}
+																	onDeleteItem={(
 																		id,
-																	)
-																}
-																onEdit={(id) =>
-																	console.log(
-																		'edit ID: ',
+																	) =>
+																		console.log(
+																			'delete ID: ',
+																			id,
+																		)
+																	}
+																	onEdit={(
 																		id,
-																	)
-																}
-															/>
-														</DragAndDropItem>
-													))
-												}
-											</DragAndDropContainer>
-										</div>
-									</DragAndDropItem>
-								))
+																	) =>
+																		console.log(
+																			'edit ID: ',
+																			id,
+																		)
+																	}
+																	titleColor={
+																		'blue'
+																	}
+																/>
+															</DragAndDropItem>
+														))
+													}
+												</DragAndDropContainer>
+											</DraggableColumn>
+										</DragAndDropItem>
+									);
+								})
 							}
 						</DragAndDropContainer>
 					</DragAndDropProvider>

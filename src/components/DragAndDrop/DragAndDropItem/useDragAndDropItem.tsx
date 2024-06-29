@@ -2,9 +2,14 @@ import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvid
 import { useContextSelector } from 'use-context-selector';
 import { isEmpty } from 'lodash';
 import { DragAndDropContainerContext } from '../DragAndDropContainer/DragAndDropContainer';
-import { DragAndDropItemContext, OnDragItemProps } from './DragAndDropItem';
+import {
+	DragAndDropItemContext,
+	DragAndDropItemProps,
+} from './DragAndDropItem';
 
-export const useDragAndDropItem = ({ id }: Pick<OnDragItemProps, 'id'>) => {
+type UseDragAndDropItemProps = Pick<DragAndDropItemProps, 'id'>;
+
+export const useDragAndDropItem = ({ id }: UseDragAndDropItemProps) => {
 	const onDragItem = useContextSelector(
 		DragAndDropContext,
 		(state) => state.onDragItem,

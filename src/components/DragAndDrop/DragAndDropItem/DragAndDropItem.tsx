@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 import { useContextSelector } from 'use-context-selector';
 import { createContext } from 'use-context-selector';
 import { DragAndDropHelpers } from '../helpers/DragAndDrop.helpers';
 import { useDragAndDropItem } from './useDragAndDropItem';
+import { isEqual } from 'lodash';
 
 export interface OnDragItemProps {
 	id: string;
@@ -30,10 +31,20 @@ export interface OnItemDimensionsChange {
 	height: number;
 }
 
-interface DragAndDropItemProps {
+export interface DragAndDropItemProps {
 	id: string;
 	padding?: number;
 	children?: React.ReactNode;
+	onDragItemStart?: ({
+		containerId,
+		itemWidth,
+		itemHeight,
+	}: {
+		containerId?: string;
+		itemWidth: number;
+		itemHeight: number;
+	}) => void;
+	onDragItemFinish?: () => void;
 }
 
 type DragAndDropItemContextProps = {
@@ -49,6 +60,8 @@ export const DragAndDropItemComponent = ({
 	id,
 	padding,
 	children,
+	onDragItemStart,
+	onDragItemFinish,
 }: DragAndDropItemProps) => {
 	const {
 		containerId,
@@ -75,6 +88,9 @@ export const DragAndDropItemComponent = ({
 		canDisplaySlots,
 	} = useDragAndDropItem({ id });
 
+	const [itemWidth, setItemWidth] = useState(0);
+	const [itemHeight, setItemHeight] = useState(0);
+
 	const itemRef = useRef<HTMLDivElement>(null);
 
 	const onItemDimensionsChange = useContextSelector(
@@ -82,6 +98,9 @@ export const DragAndDropItemComponent = ({
 		(state) => state.onItemDimensionsChange,
 	);
 	const onDimensionsChange = () => {
+		setItemWidth(itemRef.current?.getBoundingClientRect().width || 0);
+		setItemHeight(itemRef.current?.getBoundingClientRect().height || 0);
+
 		onItemDimensionsChange({
 			id,
 			width: itemRef.current?.getBoundingClientRect().width || 0,
@@ -137,6 +156,11 @@ export const DragAndDropItemComponent = ({
 					}}
 					onMouseDown={(event) => {
 						event.stopPropagation();
+						onDragItemStart?.({
+							containerId,
+							itemWidth,
+							itemHeight,
+						});
 						setParentItemOfDraggedItemId(parentItemId);
 						onDimensionsChange();
 						onDragItem({
@@ -159,6 +183,7 @@ export const DragAndDropItemComponent = ({
 					}}
 					onMouseUp={(event) => {
 						event.stopPropagation();
+						onDragItemFinish?.();
 						onDropItem({
 							id,
 						});
@@ -171,7 +196,10 @@ export const DragAndDropItemComponent = ({
 	);
 };
 
-export const DragAndDropItem = React.memo(DragAndDropItemComponent);
+export const DragAndDropItem = React.memo(
+	DragAndDropItemComponent,
+	(prevProps, nextProps) => isEqual(prevProps, nextProps),
+);
 
 const DraggableWrapper = styled.div<{
 	spaceForDraggedItem: number;

@@ -84,7 +84,6 @@ const DraggebleItemWrapper = styled.div(
 		background-color: ${colors.powderWhite};
 		border-radius: 5px;
 		padding: 15px 10px;
-		/* border: 1px solid black; */
 	`,
 );
 
