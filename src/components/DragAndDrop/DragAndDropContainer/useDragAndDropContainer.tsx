@@ -11,7 +11,6 @@ export const useDragAndDropContainer = ({
 	namespace,
 }: Pick<DragAndDropContainerProps, 'containerId' | 'namespace'>) => {
 	const [isMouseOver, setIsMouseOver] = useState(false);
-	const [isContainerFocused, setIsContainerFocused] = useState(false);
 
 	const draggedItemNamespace = useContextSelector(
 		DragAndDropContext,
@@ -26,6 +25,11 @@ export const useDragAndDropContainer = ({
 	const canDisplaySlots = useContextSelector(
 		DragAndDropContext,
 		(state) => state.canDisplaySlots,
+	);
+
+	const setFocusedContainerId = useContextSelector(
+		DragAndDropContext,
+		(state) => state.setFocusedContainerId,
 	);
 
 	const draggedItemContainerId = useContextSelector(
@@ -56,9 +60,9 @@ export const useDragAndDropContainer = ({
 			(!canDisplaySlots && draggedItemContainerId === containerId) ||
 			isMouseOverSlot
 		) {
-			setIsContainerFocused(true);
+			setFocusedContainerId(containerId);
 		} else {
-			setIsContainerFocused(false);
+			setFocusedContainerId('');
 		}
 	}, [isMouseOverSlot, draggedItemContainerId]);
 
@@ -67,6 +71,5 @@ export const useDragAndDropContainer = ({
 		setIsMouseOver,
 		draggedItemNamespace,
 		sortedItems,
-		isContainerFocused,
 	};
 };

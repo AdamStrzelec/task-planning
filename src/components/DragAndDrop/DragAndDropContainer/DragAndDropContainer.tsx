@@ -23,8 +23,6 @@ export interface DragAndDropContainerProps {
 		slotsPositionXWithOffset?: boolean;
 		slotsPositionYWithOffset?: boolean;
 	};
-	onContainerFocused?: () => void;
-	onContainerUnfocused?: () => void;
 }
 
 type DragAndDropContainerContextProps = {
@@ -49,19 +47,12 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 		slotsPositionXWithOffset: true,
 		slotsPositionYWithOffset: true,
 	},
-	onContainerFocused,
-	onContainerUnfocused,
 }) => {
-	const {
-		draggedItemNamespace,
-		isMouseOver,
-		setIsMouseOver,
-		sortedItems,
-		isContainerFocused,
-	} = useDragAndDropContainer({
-		containerId,
-		namespace,
-	});
+	const { draggedItemNamespace, isMouseOver, setIsMouseOver, sortedItems } =
+		useDragAndDropContainer({
+			containerId,
+			namespace,
+		});
 
 	const setItemsSlots = useContextSelector(
 		DragAndDropContext,
@@ -101,14 +92,6 @@ const DragAndDropContainerComponent: React.FC<DragAndDropContainerProps> = ({
 		containerRef.current?.getBoundingClientRect().top,
 		containerRef.current?.getBoundingClientRect().left,
 	]);
-
-	useEffect(() => {
-		if (isContainerFocused) {
-			onContainerFocused?.();
-		} else {
-			onContainerUnfocused?.();
-		}
-	}, [isContainerFocused]);
 
 	return (
 		<DragAndDropContainerContext.Provider

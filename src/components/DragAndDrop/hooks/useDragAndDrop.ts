@@ -95,6 +95,7 @@ export type DraggedItemPositionDifference = Position;
 
 export const useDragAndDrop = (dragAndDropItems: Items) => {
 	const [items, setItems] = useState<Items>(dragAndDropItems);
+	const [focusedContainerIdState, setfocusedContainerIdState] = useState('');
 	const [draggedItemMetadata, setDraggedItemMetadata] =
 		useState<DraggedItemsMetadata>({
 			draggedItem: {},
@@ -315,6 +316,10 @@ export const useDragAndDrop = (dragAndDropItems: Items) => {
 		[],
 	);
 
+	const setFocusedContainerId = useCallback((containerId: string) => {
+		setfocusedContainerIdState(containerId);
+	}, []);
+
 	return {
 		providerPosition,
 		setProviderPosition,
@@ -339,5 +344,7 @@ export const useDragAndDrop = (dragAndDropItems: Items) => {
 		setIsMouseOver,
 		canDisplaySlots: canDisplaySlotsState,
 		setCanDisplaySlots,
+		focusedContainerId: focusedContainerIdState,
+		setFocusedContainerId,
 	};
 };

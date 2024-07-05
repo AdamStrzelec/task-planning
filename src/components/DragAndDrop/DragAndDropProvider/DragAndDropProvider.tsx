@@ -86,6 +86,10 @@ export const DragAndDropContext = createContext<DragAndDropContextProps>({
 	setCanDisplaySlots: () => {
 		/**/
 	},
+	focusedContainerId: undefined,
+	setFocusedContainerId: () => {
+		/**/
+	},
 });
 
 type DragAndDropProveiderComponentProps = {
@@ -136,6 +140,8 @@ type DragAndDropContextProps = {
 	) => void;
 	canDisplaySlots: boolean;
 	setCanDisplaySlots: (canDisplaySlots: boolean) => void;
+	focusedContainerId?: string;
+	setFocusedContainerId: (containrId: string) => void;
 };
 
 type DragAndDropProveiderProps = {
@@ -171,6 +177,8 @@ export const DragAndDropProvider = ({
 		setIsMouseOver,
 		canDisplaySlots,
 		setCanDisplaySlots,
+		focusedContainerId,
+		setFocusedContainerId,
 	} = useDragAndDrop(dragAndDropItems);
 
 	return (
@@ -199,6 +207,8 @@ export const DragAndDropProvider = ({
 				setIsMouseOver,
 				canDisplaySlots,
 				setCanDisplaySlots,
+				focusedContainerId,
+				setFocusedContainerId,
 			}}
 		>
 			<ContainerWrapper>

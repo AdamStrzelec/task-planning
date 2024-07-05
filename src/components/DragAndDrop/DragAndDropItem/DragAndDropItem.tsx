@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { DragAndDropContext } from 'src/components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
 import { useContextSelector } from 'use-context-selector';
@@ -34,17 +34,17 @@ export interface OnItemDimensionsChange {
 export interface DragAndDropItemProps {
 	id: string;
 	padding?: number;
-	children?: React.ReactNode;
-	onDragItemStart?: ({
-		containerId,
-		itemWidth,
-		itemHeight,
+	children?: ({
+		draggedItemContainerId,
+		focusedContainerId,
+		draggedItemWidth,
+		draggedItemHeight,
 	}: {
-		containerId?: string;
-		itemWidth: number;
-		itemHeight: number;
-	}) => void;
-	onDragItemFinish?: () => void;
+		draggedItemContainerId: string;
+		focusedContainerId: string;
+		draggedItemWidth: number;
+		draggedItemHeight: number;
+	}) => React.ReactNode;
 }
 
 type DragAndDropItemContextProps = {
@@ -60,8 +60,6 @@ export const DragAndDropItemComponent = ({
 	id,
 	padding,
 	children,
-	onDragItemStart,
-	onDragItemFinish,
 }: DragAndDropItemProps) => {
 	const {
 		containerId,
@@ -86,10 +84,8 @@ export const DragAndDropItemComponent = ({
 		draggedPosY,
 		namespace,
 		canDisplaySlots,
+		focusedContainerId,
 	} = useDragAndDropItem({ id });
-
-	const [itemWidth, setItemWidth] = useState(0);
-	const [itemHeight, setItemHeight] = useState(0);
 
 	const itemRef = useRef<HTMLDivElement>(null);
 
@@ -98,9 +94,6 @@ export const DragAndDropItemComponent = ({
 		(state) => state.onItemDimensionsChange,
 	);
 	const onDimensionsChange = () => {
-		setItemWidth(itemRef.current?.getBoundingClientRect().width || 0);
-		setItemHeight(itemRef.current?.getBoundingClientRect().height || 0);
-
 		onItemDimensionsChange({
 			id,
 			width: itemRef.current?.getBoundingClientRect().width || 0,
@@ -156,11 +149,6 @@ export const DragAndDropItemComponent = ({
 					}}
 					onMouseDown={(event) => {
 						event.stopPropagation();
-						onDragItemStart?.({
-							containerId,
-							itemWidth,
-							itemHeight,
-						});
 						setParentItemOfDraggedItemId(parentItemId);
 						onDimensionsChange();
 						onDragItem({
@@ -183,13 +171,17 @@ export const DragAndDropItemComponent = ({
 					}}
 					onMouseUp={(event) => {
 						event.stopPropagation();
-						onDragItemFinish?.();
 						onDropItem({
 							id,
 						});
 					}}
 				>
-					{children}
+					{children?.({
+						draggedItemContainerId: draggedItemContainerId ?? '',
+						focusedContainerId: focusedContainerId ?? '',
+						draggedItemWidth: draggedItemWidth ?? 0,
+						draggedItemHeight: draggedItemHeight ?? 0,
+					})}
 				</div>
 			</DraggableWrapper>
 		</DragAndDropItemContext.Provider>
@@ -221,5 +213,6 @@ const DraggableWrapper = styled.div<{
 			  `}
 		z-index: ${zIndex};
 		width: 100%;
+		position: 'relative';
 	`,
 );

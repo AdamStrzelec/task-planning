@@ -128,6 +128,11 @@ export const useDragAndDropItem = ({ id }: UseDragAndDropItemProps) => {
 		(state) => state.setParentItemOfDraggedItemId,
 	);
 
+	const focusedContainerId = useContextSelector(
+		DragAndDropContext,
+		(state) => state.focusedContainerId,
+	);
+
 	return {
 		onDragItem,
 		onDropItem,
@@ -146,10 +151,12 @@ export const useDragAndDropItem = ({ id }: UseDragAndDropItemProps) => {
 		direction,
 		slotNumber,
 		isMouseOver,
+		draggedItemId,
 		parentItemId,
 		parentItemOfDraggedItemId,
 		setParentItemOfDraggedItemId,
 		namespace,
 		canDisplaySlots,
+		focusedContainerId,
 	};
 };

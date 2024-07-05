@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './App.css';
 import { GlobalStyle } from './global/global.styles';
 import { DragAndDropProvider } from './components/DragAndDrop/DragAndDropProvider/DragAndDropProvider';
@@ -11,10 +11,6 @@ import RoadImage from 'src/assets/images/road-2.jpg';
 import { DraggableColumn } from './components/molecules/DraggableColumn/DraggableColumn';
 
 function App() {
-	const [focusedContainerId, setFocusedContainerId] = useState('');
-	const [draggedItemContainerId, setDraggedItemContainerId] = useState('');
-	const [draggedItemHeight, setDraggedItemHeight] = useState(0);
-
 	return (
 		<>
 			<GlobalStyle />
@@ -48,95 +44,80 @@ function App() {
 											key={item.id}
 											id={item.id}
 										>
-											<DraggableColumn
-												title={'In progress'}
-												id={childrenContainerId}
-												draggedItemContainerId={
-													draggedItemContainerId
-												}
-												draggedItemHeight={
-													draggedItemHeight
-												}
-												focusedContainerId={
-													focusedContainerId
-												}
-											>
-												<DragAndDropContainer
-													containerId={
-														item.childrenContainerId
+											{({
+												focusedContainerId,
+												draggedItemHeight,
+												draggedItemContainerId,
+											}) => (
+												<DraggableColumn
+													title={'In progress'}
+													id={childrenContainerId}
+													draggedItemContainerId={
+														draggedItemContainerId
 													}
-													namespace={'column'}
-													onContainerFocused={() => {
-														setFocusedContainerId(
-															childrenContainerId,
-														);
-													}}
-													onContainerUnfocused={() => {
-														setFocusedContainerId(
-															'',
-														);
-													}}
+													draggedItemHeight={
+														draggedItemHeight
+													}
+													focusedContainerId={
+														focusedContainerId
+													}
 												>
-													{(items) =>
-														items.map((item) => (
-															<DragAndDropItem
-																key={item.id}
-																id={item.id}
-																onDragItemStart={({
-																	containerId,
-																	itemHeight,
-																}) => {
-																	setDraggedItemContainerId(
-																		containerId ??
-																			'',
-																	);
-																	setDraggedItemHeight(
-																		itemHeight ??
-																			0,
-																	);
-																}}
-																onDragItemFinish={() => {
-																	setDraggedItemContainerId(
-																		'',
-																	);
-																	setDraggedItemHeight(
-																		0,
-																	);
-																}}
-															>
-																<DraggableItem
-																	id={item.id}
-																	title={
-																		'asddsadsa qwewqewqewq'
-																	}
-																	text={
-																		'cxzxcz asdsasadsa qwewqeqwewq asdssad xzcxzcxxcz assasad qwewqeqwew asasddsa xzcxzcxz sadsaasd'
-																	}
-																	onDeleteItem={(
-																		id,
-																	) =>
-																		console.log(
-																			'delete ID: ',
-																			id,
-																		)
-																	}
-																	onEdit={(
-																		id,
-																	) =>
-																		console.log(
-																			'edit ID: ',
-																			id,
-																		)
-																	}
-																	titleColor={
-																		'blue'
-																	}
-																/>
-															</DragAndDropItem>
-														))
-													}
-												</DragAndDropContainer>
-											</DraggableColumn>
+													<DragAndDropContainer
+														containerId={
+															item.childrenContainerId
+														}
+														namespace={'column'}
+													>
+														{(items) =>
+															items.map(
+																(item) => (
+																	<DragAndDropItem
+																		key={
+																			item.id
+																		}
+																		id={
+																			item.id
+																		}
+																	>
+																		{() => (
+																			<DraggableItem
+																				id={
+																					item.id
+																				}
+																				title={
+																					'asddsadsa qwewqewqewq'
+																				}
+																				text={
+																					'cxzxcz asdsasadsa qwewqeqwewq asdssad xzcxzcxxcz assasad qwewqeqwew asasddsa xzcxzcxz sadsaasd'
+																				}
+																				onDeleteItem={(
+																					id,
+																				) =>
+																					console.log(
+																						'delete ID: ',
+																						id,
+																					)
+																				}
+																				onEdit={(
+																					id,
+																				) =>
+																					console.log(
+																						'edit ID: ',
+																						id,
+																					)
+																				}
+																				titleColor={
+																					'blue'
+																				}
+																			/>
+																		)}
+																	</DragAndDropItem>
+																),
+															)
+														}
+													</DragAndDropContainer>
+												</DraggableColumn>
+											)}
 										</DragAndDropItem>
 									);
 								})

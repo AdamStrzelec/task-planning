@@ -19,7 +19,6 @@ export const DraggableColumn = ({
 	draggedItemHeight,
 	focusedContainerId,
 }: DraggableColumnProps) => {
-	console.log(draggedItemHeight);
 	return (
 		<Wrapper>
 			<HeaderWrapper>
@@ -28,8 +27,25 @@ export const DraggableColumn = ({
 					<IconManager name={'Options'} />
 				</OptionsButton>
 			</HeaderWrapper>
+			<AddItemButtonWrapper>
+				<AddItemButton>
+					Add Item{' '}
+					<AddItemIconWrapper>
+						<IconManager name={'Plus'} />
+					</AddItemIconWrapper>
+				</AddItemButton>
+			</AddItemButtonWrapper>
 			<ContentWrapper>{children}</ContentWrapper>
-			{!!draggedItemContainerId && <div></div>}
+			<DraggedItemSpacer
+				space={
+					focusedContainerId == draggedItemContainerId
+						? 0
+						: !!draggedItemHeight && focusedContainerId === id
+						? draggedItemHeight
+						: 0
+				}
+				shouldAnimate={!!draggedItemHeight}
+			/>
 		</Wrapper>
 	);
 };
@@ -77,5 +93,42 @@ const OptionsButton = styled.button(
 		justify-content: center;
 		cursor: pointer;
 		background-color: transparent;
+	`,
+);
+
+const AddItemButtonWrapper = styled.div`
+	padding: 10px 15px 0;
+	display: flex;
+	justify-content: flex-end;
+`;
+
+const AddItemButton = styled.button(
+	({ theme: { colors, fontSize } }) => css`
+		border: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		background-color: rgba(255, 255, 255, 0.4);
+		color: ${colors.itemText};
+		font-size: ${fontSize.s}px;
+		padding: 5px 12px;
+		border-radius: 15px;
+	`,
+);
+
+const AddItemIconWrapper = styled.div`
+	margin-top: -2px;
+	padding: 0 3px;
+`;
+
+const DraggedItemSpacer = styled.div<{ space: number; shouldAnimate: boolean }>(
+	({ space, shouldAnimate }) => css`
+		width: 100%;
+		height: ${space}px;
+		${shouldAnimate &&
+		css`
+			transition: height 0.3s ease-in-out;
+		`}
 	`,
 );
